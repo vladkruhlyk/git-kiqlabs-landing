@@ -249,7 +249,11 @@ function CountrySelect() {
       <label className="block font-mono text-[10px] uppercase tracking-[0.22em] text-[var(--color-stone)] mb-2">
         {t.contact.fields.country.label}
       </label>
-      <input type="hidden" name="country" value={selected.name} />
+      <input
+        type="hidden"
+        name="country"
+        value={`${selected.flag} ${selected.name}`}
+      />
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

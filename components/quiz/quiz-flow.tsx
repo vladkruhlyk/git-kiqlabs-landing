@@ -132,8 +132,10 @@ export function QuizFlow() {
     const roleLabel = ROLES.find((r) => r.id === answers.role)?.title ?? answers.role;
     const volumeLabel =
       VOLUMES.find((v) => v.id === answers.volume)?.title ?? answers.volume;
-    const countryLabel =
-      COUNTRIES.find((c) => c.code === answers.country)?.ru ?? answers.country;
+    const countryItem = COUNTRIES.find((c) => c.code === answers.country);
+    const countryLabel = countryItem
+      ? `${countryItem.flag} ${countryItem.ru}`
+      : answers.country;
     const categoriesLabel = (answers.categories || [])
       .map((id) => CATEGORIES.find((c) => c.id === id)?.title ?? id)
       .join(", ");

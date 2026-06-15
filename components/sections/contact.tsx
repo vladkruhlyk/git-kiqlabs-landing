@@ -4,10 +4,11 @@ import { motion } from "motion/react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLang } from "@/components/ui/lang-provider";
+import { submitLead } from "@/lib/lead";
 
 export function Contact() {
   const [submitted, setSubmitted] = useState(false);
-  const { t } = useLang();
+  const { t, lang } = useLang();
 
   return (
     <section id="contact" className="relative py-16 lg:py-32">
@@ -107,7 +108,21 @@ export function Contact() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
+                  const fd = new FormData(e.currentTarget);
+                  const get = (k: string) => (fd.get(k)?.toString() ?? "").trim();
+                  // Оптимистично показываем успех — заявку не теряем из-за сети.
                   setSubmitted(true);
+                  void submitLead({
+                    source: "contact",
+                    name: get("name"),
+                    company: get("company"),
+                    email: get("email"),
+                    phone: get("phone"),
+                    country: get("country"),
+                    inquiry: get("inquiry"),
+                    message: get("message"),
+                    locale: lang,
+                  });
                 }}
                 className="flex flex-col gap-5 bg-[var(--color-bone)] border border-[var(--color-line)] rounded-2xl p-6 lg:p-8 shadow-[0_1px_0_var(--color-line)] relative"
               >

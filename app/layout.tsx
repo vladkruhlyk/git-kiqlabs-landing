@@ -3,6 +3,7 @@ import { Unbounded, Geist, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { LenisProvider } from "@/components/ui/lenis-provider";
 import { LangProvider } from "@/components/ui/lang-provider";
+import { FacebookPixel } from "@/components/analytics/fb-pixel";
 
 const unbounded = Unbounded({
   subsets: ["latin", "latin-ext", "cyrillic", "cyrillic-ext"],
@@ -46,6 +47,7 @@ export default function RootLayout({
       className={`${unbounded.variable} ${geist.variable} ${jetbrains.variable}`}
     >
       <body className="antialiased">
+        <FacebookPixel />
         <LangProvider>
           <LenisProvider>{children}</LenisProvider>
         </LangProvider>

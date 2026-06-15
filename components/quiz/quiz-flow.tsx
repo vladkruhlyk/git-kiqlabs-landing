@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { useLang } from "@/components/ui/lang-provider";
 import type { Dictionary } from "@/lib/i18n";
 import { LangToggle } from "@/components/ui/lang-toggle";
+import { submitLead } from "@/lib/lead";
 
 type Answers = {
   role?: string;
@@ -124,8 +125,21 @@ export function QuizFlow() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (submitted) return;
     setSubmitted(true);
     setStep(TOTAL_STEPS);
+    void submitLead({
+      source: "quiz",
+      name: answers.name,
+      company: answers.company,
+      email: answers.email,
+      phone: answers.contact,
+      country: answers.country,
+      role: answers.role,
+      categories: (answers.categories || []).join(", "),
+      volume: answers.volume,
+      locale: lang,
+    });
   };
 
   const progress = Math.min(step / TOTAL_STEPS, 1);

@@ -128,16 +128,25 @@ export function QuizFlow() {
     if (submitted) return;
     setSubmitted(true);
     setStep(TOTAL_STEPS);
+    // Отправляем читаемые названия, а не id/коды.
+    const roleLabel = ROLES.find((r) => r.id === answers.role)?.title ?? answers.role;
+    const volumeLabel =
+      VOLUMES.find((v) => v.id === answers.volume)?.title ?? answers.volume;
+    const countryLabel =
+      COUNTRIES.find((c) => c.code === answers.country)?.ru ?? answers.country;
+    const categoriesLabel = (answers.categories || [])
+      .map((id) => CATEGORIES.find((c) => c.id === id)?.title ?? id)
+      .join(", ");
     void submitLead({
       source: "quiz",
       name: answers.name,
       company: answers.company,
       email: answers.email,
       phone: answers.contact,
-      country: answers.country,
-      role: answers.role,
-      categories: (answers.categories || []).join(", "),
-      volume: answers.volume,
+      country: countryLabel,
+      role: roleLabel,
+      categories: categoriesLabel,
+      volume: volumeLabel,
       locale: lang,
     });
   };

@@ -6,6 +6,8 @@ export const dynamic = "force-dynamic";
 
 type LeadBody = Record<string, unknown>;
 
+const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
+
 export async function POST(req: Request) {
   const webhookUrl = process.env.LEAD_WEBHOOK_URL;
 
@@ -20,10 +22,7 @@ export async function POST(req: Request) {
   }
 
   // Минимальная валидация: должен быть хоть какой-то способ связи.
-  const hasContact =
-    typeof data.email === "string" && data.email.trim().length > 0
-      ? true
-      : typeof data.phone === "string" && data.phone.trim().length > 0;
+  const hasContact = !!str(data.email) || !!str(data.phone);
   if (!hasContact) {
     return NextResponse.json(
       { ok: false, error: "missing_contact" },
@@ -33,6 +32,8 @@ export async function POST(req: Request) {
 
   const payload = {
     ...data,
+    // Готовое тело карточки для KeyCRM — Make форвардит его в openapi.keycrm.app.
+    keycrm_data: buildKeyCrmData(data),
     submittedAt: new Date().toISOString(),
     userAgent: req.headers.get("user-agent") ?? "",
     ip:
@@ -73,4 +74,40 @@ export async function POST(req: Request) {
   }
 
   return NextResponse.json({ ok: true, forwarded: true });
+}
+
+/**
+ * Собирает готовое тело карточки KeyCRM (POST /v1/pipelines/cards).
+ * Make берёт его из поля keycrm_data и форвардит в KeyCRM как есть.
+ */
+function buildKeyCrmData(data: LeadBody) {
+  const name = str(data.name);
+  const company = str(data.company);
+  const phone = str(data.phone);
+
+  const comment = [
+    `Компания: ${company || "-"}`,
+    `Telegram/Телефон: ${phone || "-"}`,
+  ];
+  if (str(data.role)) comment.push(`Тип бизнеса: ${str(data.role)}`);
+  if (str(data.categories)) comment.push(`Категории: ${str(data.categories)}`);
+  if (str(data.volume)) comment.push(`Объём: ${str(data.volume)}`);
+  if (str(data.country)) comment.push(`Страна: ${str(data.country)}`);
+  if (str(data.inquiry)) comment.push(`Тип запроса: ${str(data.inquiry)}`);
+  comment.push(`Комментарий: ${str(data.message) || "-"}`);
+
+  const keycrm: Record<string, unknown> = {
+    title: name ? `Заявка от ${name}` : "Заявка с сайта",
+    manager_comment: comment.join("\n"),
+    contact: {
+      full_name: name || undefined,
+      email: str(data.email) || undefined,
+      phone: phone || undefined,
+    },
+  };
+  // source_id (id источника в KeyCRM) — опционально, через env.
+  if (process.env.KEYCRM_SOURCE_ID) {
+    keycrm.source_id = Number(process.env.KEYCRM_SOURCE_ID);
+  }
+  return keycrm;
 }

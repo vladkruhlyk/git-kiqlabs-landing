@@ -24,23 +24,31 @@ Open <http://localhost:3000>.
 ## Заявки (webhook) и Meta Pixel
 
 Формы (контакты + квиз) шлют заявку на серверный роут `app/api/lead/route.ts`,
-который пересылает её на ваш webhook. Meta Pixel отслеживает `PageView` и
-событие `Lead` при отправке любой формы.
+который пересылает её на ваш **webhook** (Make / Zapier / n8n). Внутри payload
+есть готовый объект `keycrm_data` — Make форвардит его в KeyCRM (создать карточку
+в воронке), а остальные поля кладёт в Google Таблицу. Токен KeyCRM остаётся в
+Make, на сайте его нет.
 
-Настраивается через `.env.local`:
+Meta Pixel отслеживает `PageView` и событие `Lead` (только после успешной
+отправки заявки).
+
+Настраивается через `.env.local` (на проде — переменные окружения хостинга):
 
 ```bash
-# Webhook для заявок (Make / Zapier / n8n / Google Apps Script → Google Sheets)
+# Webhook для заявок (Make / Zapier / n8n → Google Sheets + KeyCRM)
 LEAD_WEBHOOK_URL=https://hook.eu2.make.com/xxxxxxxx
+
+# id источника в KeyCRM — опц., попадёт в keycrm_data.source_id
+KEYCRM_SOURCE_ID=3
 
 # Meta Pixel ID из Events Manager
 NEXT_PUBLIC_FB_PIXEL_ID=1234567890123456
 ```
 
-Если переменные пустые — сайт работает как раньше: пиксель не грузится,
-заявка принимается и пишется в лог сервера (`[lead] {...}`), но не пересылается.
+Если `LEAD_WEBHOOK_URL` пуст — заявка принимается и пишется в лог сервера
+(`[lead] {...}`), но не пересылается.
 
-**На что приходит заявка (JSON):**
+**Что уходит на webhook (JSON):**
 
 ```jsonc
 {
@@ -49,22 +57,29 @@ NEXT_PUBLIC_FB_PIXEL_ID=1234567890123456
   "company": "...",
   "email": "...",
   "phone": "...",           // в квизе — мессенджер-контакт
-  "country": "AE",
+  "country": "🇰🇿 Казахстан",
   "inquiry": "...",         // только форма контактов
   "message": "...",         // только форма контактов
-  "role": "distributor",    // только квиз
-  "categories": "sports, vitamins", // только квиз
+  "role": "Дистрибьютор / оптовик", // только квиз
+  "categories": "Спортивное питание", // только квиз
   "volume": "...",          // только квиз
   "locale": "ru",
   "page": "https://kiqlabs.global/quiz",
-  "referrer": "...",
+  // Готовая карточка для KeyCRM (Make форвардит её в /v1/pipelines/cards):
+  "keycrm_data": {
+    "title": "Заявка от Иван",
+    "source_id": 3,                 // если задан KEYCRM_SOURCE_ID
+    "manager_comment": "Компания: …\nTelegram/Телефон: …\nТип бизнеса: …\n…",
+    "contact": { "full_name": "Иван", "email": "...", "phone": "..." }
+  },
   "submittedAt": "2026-06-15T10:00:00.000Z",
   "userAgent": "...",
   "ip": "..."
 }
 ```
 
-Эти ключи можно один-в-один маппить на колонки Google Таблицы.
+Плоские поля (name, email, country …) удобно класть в Google Таблицу, а
+`keycrm_data` — целиком в тело HTTP-запроса к KeyCRM в Make.
 
 ## Project structure
 

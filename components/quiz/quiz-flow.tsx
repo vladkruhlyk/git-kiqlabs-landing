@@ -627,28 +627,9 @@ function ThankYou({ answers }: { answers: Answers }) {
         {t.quiz.thanks.body}
       </p>
 
-      <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto">
-        <a
-          href="https://t.me/kiqlabs"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--color-bone)]/10 hover:bg-[var(--color-bone)]/15 transition-colors px-5 py-3 text-[13px] font-semibold"
-        >
-          {t.quiz.thanks.tg}
-        </a>
-        <a
-          href="https://wa.me/13126817103"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 rounded-full bg-[var(--color-bone)]/10 hover:bg-[var(--color-bone)]/15 transition-colors px-5 py-3 text-[13px] font-semibold"
-        >
-          {t.quiz.thanks.wa}
-        </a>
-      </div>
-
       <a
         href={lang === "en" ? "/en" : "/"}
-        className="mt-8 inline-block font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-stone-soft)] hover:text-[var(--color-bone)] transition-colors"
+        className="mt-10 inline-block font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-stone-soft)] hover:text-[var(--color-bone)] transition-colors"
       >
         {t.quiz.thanks.backToSite}
       </a>

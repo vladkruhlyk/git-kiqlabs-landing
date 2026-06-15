@@ -6,11 +6,12 @@ export const dynamic = "force-dynamic";
 
 type LeadBody = Record<string, unknown>;
 
+const KEYCRM_URL =
+  process.env.KEYCRM_API_URL ?? "https://openapi.keycrm.app/v1/pipelines/cards";
+
 const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
 
 export async function POST(req: Request) {
-  const webhookUrl = process.env.LEAD_WEBHOOK_URL;
-
   let data: LeadBody;
   try {
     data = (await req.json()) as LeadBody;
@@ -30,10 +31,10 @@ export async function POST(req: Request) {
     );
   }
 
-  const payload = {
+  const card = buildKeyCrmData(data);
+  const lead = {
     ...data,
-    // Готовое тело карточки для KeyCRM — Make форвардит его в openapi.keycrm.app.
-    keycrm_data: buildKeyCrmData(data),
+    keycrm_data: card, // на случай, если webhook сам форвардит в KeyCRM
     submittedAt: new Date().toISOString(),
     userAgent: req.headers.get("user-agent") ?? "",
     ip:
@@ -42,44 +43,80 @@ export async function POST(req: Request) {
       "",
   };
 
-  // Бэкап: всегда пишем заявку в лог сервера, даже если webhook упадёт.
-  console.log("[lead]", JSON.stringify(payload));
+  // Бэкап: всегда пишем заявку в лог сервера.
+  console.log("[lead]", JSON.stringify(lead));
 
-  if (!webhookUrl) {
-    console.warn(
-      "[lead] LEAD_WEBHOOK_URL не задан — заявка получена, но никуда не переслана.",
-    );
-    return NextResponse.json({ ok: true, forwarded: false });
+  // Шлём во все настроенные получатели параллельно.
+  const tasks: { name: string; run: () => Promise<boolean> }[] = [];
+  if (process.env.LEAD_WEBHOOK_URL) {
+    tasks.push({ name: "webhook", run: () => sendToWebhook(lead) });
+  }
+  if (process.env.KEYCRM_API_TOKEN) {
+    tasks.push({ name: "keycrm", run: () => sendToKeyCrm(card) });
   }
 
+  if (tasks.length === 0) {
+    console.warn("[lead] нет настроенных получателей (webhook/KeyCRM).");
+    return NextResponse.json({ ok: true, delivered: {} });
+  }
+
+  const settled = await Promise.allSettled(tasks.map((t) => t.run()));
+  const delivered: Record<string, boolean> = {};
+  settled.forEach((r, i) => {
+    delivered[tasks[i].name] = r.status === "fulfilled" && r.value === true;
+  });
+
+  const anyOk = Object.values(delivered).some(Boolean);
+  return NextResponse.json(
+    { ok: anyOk, delivered },
+    { status: anyOk ? 200 : 502 },
+  );
+}
+
+/** Пересылает заявку как есть на внешний webhook (Make → Google Sheets). */
+async function sendToWebhook(lead: LeadBody): Promise<boolean> {
   try {
-    const res = await fetch(webhookUrl, {
+    const res = await fetch(process.env.LEAD_WEBHOOK_URL as string, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(lead),
     });
     if (!res.ok) {
       console.error("[lead] webhook ответил статусом", res.status);
-      return NextResponse.json(
-        { ok: false, error: "webhook_failed", status: res.status },
-        { status: 502 },
-      );
+      return false;
     }
+    return true;
   } catch (err) {
     console.error("[lead] ошибка отправки на webhook", err);
-    return NextResponse.json(
-      { ok: false, error: "webhook_error" },
-      { status: 502 },
-    );
+    return false;
   }
-
-  return NextResponse.json({ ok: true, forwarded: true });
 }
 
-/**
- * Собирает готовое тело карточки KeyCRM (POST /v1/pipelines/cards).
- * Make берёт его из поля keycrm_data и форвардит в KeyCRM как есть.
- */
+/** Создаёт карточку лида напрямую в воронке KeyCRM. */
+async function sendToKeyCrm(card: Record<string, unknown>): Promise<boolean> {
+  try {
+    const res = await fetch(KEYCRM_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.KEYCRM_API_TOKEN}`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(card),
+    });
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      console.error("[lead] KeyCRM ошибка", res.status, body.slice(0, 500));
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error("[lead] ошибка запроса к KeyCRM", err);
+    return false;
+  }
+}
+
+/** Готовое тело карточки KeyCRM (POST /v1/pipelines/cards). */
 function buildKeyCrmData(data: LeadBody) {
   const name = str(data.name);
   const company = str(data.company);
@@ -96,7 +133,7 @@ function buildKeyCrmData(data: LeadBody) {
   if (str(data.inquiry)) comment.push(`Тип запроса: ${str(data.inquiry)}`);
   comment.push(`Комментарий: ${str(data.message) || "-"}`);
 
-  const keycrm: Record<string, unknown> = {
+  const card: Record<string, unknown> = {
     title: name ? `Заявка от ${name}` : "Заявка с сайта",
     manager_comment: comment.join("\n"),
     contact: {
@@ -105,9 +142,11 @@ function buildKeyCrmData(data: LeadBody) {
       phone: phone || undefined,
     },
   };
-  // source_id (id источника в KeyCRM) — опционально, через env.
-  if (process.env.KEYCRM_SOURCE_ID) {
-    keycrm.source_id = Number(process.env.KEYCRM_SOURCE_ID);
+  if (process.env.KEYCRM_PIPELINE_ID) {
+    card.pipeline_id = Number(process.env.KEYCRM_PIPELINE_ID);
   }
-  return keycrm;
+  if (process.env.KEYCRM_SOURCE_ID) {
+    card.source_id = Number(process.env.KEYCRM_SOURCE_ID);
+  }
+  return card;
 }

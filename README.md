@@ -24,29 +24,33 @@ Open <http://localhost:3000>.
 ## Заявки (webhook) и Meta Pixel
 
 Формы (контакты + квиз) шлют заявку на серверный роут `app/api/lead/route.ts`,
-который пересылает её на ваш **webhook** (Make / Zapier / n8n). Внутри payload
-есть готовый объект `keycrm_data` — Make форвардит его в KeyCRM (создать карточку
-в воронке), а остальные поля кладёт в Google Таблицу. Токен KeyCRM остаётся в
-Make, на сайте его нет.
+который **параллельно** доставляет её во все настроенные получатели:
+1. напрямую в **KeyCRM** (создаёт карточку в воронке) — если задан `KEYCRM_API_TOKEN`;
+2. на **webhook** (Make / Zapier / n8n → Google Sheets) — если задан `LEAD_WEBHOOK_URL`.
 
-Meta Pixel отслеживает `PageView` и событие `Lead` (только после успешной
-отправки заявки).
+Доставки независимы. Meta Pixel отслеживает `PageView` и событие `Lead` (только
+после успешной доставки хотя бы в один получатель). Токен KeyCRM — только на
+сервере (без `NEXT_PUBLIC_`), в браузер не попадает.
 
 Настраивается через `.env.local` (на проде — переменные окружения хостинга):
 
 ```bash
-# Webhook для заявок (Make / Zapier / n8n → Google Sheets + KeyCRM)
-LEAD_WEBHOOK_URL=https://hook.eu2.make.com/xxxxxxxx
+# KeyCRM — прямое создание карточек. Токен СЕКРЕТНЫЙ (без NEXT_PUBLIC_).
+KEYCRM_API_TOKEN=xxxxxxxx
+KEYCRM_PIPELINE_ID=1     # опц.: id воронки (по умолчанию — первая)
+KEYCRM_SOURCE_ID=3       # опц.: id источника
+# KEYCRM_API_URL=...     # опц.: переопределить эндпоинт (для тестов)
 
-# id источника в KeyCRM — опц., попадёт в keycrm_data.source_id
-KEYCRM_SOURCE_ID=3
+# Webhook для Google Sheets (опц.)
+LEAD_WEBHOOK_URL=https://hook.eu2.make.com/xxxxxxxx
 
 # Meta Pixel ID из Events Manager
 NEXT_PUBLIC_FB_PIXEL_ID=1234567890123456
 ```
 
-Если `LEAD_WEBHOOK_URL` пуст — заявка принимается и пишется в лог сервера
-(`[lead] {...}`), но не пересылается.
+Если ничего не задано — заявка принимается и пишется в лог сервера
+(`[lead] {...}`), но никуда не отправляется. Поле `keycrm_data` всё равно есть
+в payload вебхука — на случай, если KeyCRM настраивается через Make.
 
 **Что уходит на webhook (JSON):**
 

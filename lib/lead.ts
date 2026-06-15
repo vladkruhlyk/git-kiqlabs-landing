@@ -23,16 +23,13 @@ export type LeadPayload = {
 };
 
 /**
- * Отправляет заявку: триггерит Meta Pixel "Lead" и шлёт данные на /api/lead.
+ * Отправляет заявку на /api/lead и только ПОСЛЕ успешной доставки
+ * триггерит Meta Pixel "Lead" — чтобы не считать конверсии, которые не дошли.
  * Никогда не бросает исключение — UX формы не должен ломаться из-за сети.
  */
 export async function submitLead(payload: LeadPayload): Promise<void> {
-  // 1. Meta Pixel — стандартное событие Lead.
-  track("Lead", { content_name: payload.source });
-
-  // 2. Отправка на серверный роут (он уже пересылает на webhook).
   try {
-    await fetch("/api/lead", {
+    const res = await fetch("/api/lead", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       keepalive: true,
@@ -42,8 +39,15 @@ export async function submitLead(payload: LeadPayload): Promise<void> {
         referrer: typeof document !== "undefined" ? document.referrer : "",
       }),
     });
+
+    if (res.ok) {
+      // Заявка принята сервером → отдаём стандартное событие Meta Pixel.
+      track("Lead", { content_name: payload.source });
+    } else {
+      console.error("[lead] заявка не отправлена, статус", res.status);
+    }
   } catch (err) {
-    // Лог в консоль — заявка не должна теряться молча для разработчика.
+    // Сеть упала — заявка не ушла, Lead не отправляем.
     console.error("[lead] submit failed", err);
   }
 }

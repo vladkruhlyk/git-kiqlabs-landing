@@ -177,16 +177,9 @@ export function QuizFlow() {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/media/logo.webp"
+              src="/media/logo-light.webp"
               alt="KIQ Labs Global"
-              className="h-9 lg:h-10 w-auto select-none mix-blend-lighten"
-              style={{
-                filter: "invert(1) brightness(1.1)",
-                maskImage:
-                  "radial-gradient(ellipse 75% 80% at 50% 50%, black 55%, transparent 95%)",
-                WebkitMaskImage:
-                  "radial-gradient(ellipse 75% 80% at 50% 50%, black 55%, transparent 95%)",
-              }}
+              className="h-9 lg:h-10 w-auto select-none"
               draggable={false}
             />
           </a>
@@ -695,16 +688,9 @@ function Intro({ onStart }: { onStart: () => void }) {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/media/logo.webp"
+              src="/media/logo-light.webp"
               alt="KIQ Labs Global"
-              className="h-9 lg:h-10 w-auto select-none mix-blend-lighten"
-              style={{
-                filter: "invert(1) brightness(1.1)",
-                maskImage:
-                  "radial-gradient(ellipse 75% 80% at 50% 50%, black 55%, transparent 95%)",
-                WebkitMaskImage:
-                  "radial-gradient(ellipse 75% 80% at 50% 50%, black 55%, transparent 95%)",
-              }}
+              className="h-9 lg:h-10 w-auto select-none"
               draggable={false}
             />
           </a>

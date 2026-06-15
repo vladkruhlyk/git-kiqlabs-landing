@@ -41,18 +41,16 @@ export function Navigation() {
         )}
       >
         <nav className="mx-auto flex max-w-[1440px] items-center justify-between px-6 lg:px-10 h-16 lg:h-20">
-          <a href="#top" className="group flex items-center" aria-label="KIQ Labs Global">
+          <a
+            href="#top"
+            className="group flex items-center"
+            aria-label="KIQ Labs Global"
+          >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/media/logo.webp"
+              src="/media/logo-dark.webp"
               alt="KIQ Labs Global"
-              className="h-9 lg:h-10 w-auto select-none mix-blend-darken"
-              style={{
-                maskImage:
-                  "radial-gradient(ellipse 75% 80% at 50% 50%, black 55%, transparent 95%)",
-                WebkitMaskImage:
-                  "radial-gradient(ellipse 75% 80% at 50% 50%, black 55%, transparent 95%)",
-              }}
+              className="h-9 lg:h-10 w-auto select-none"
               draggable={false}
             />
           </a>

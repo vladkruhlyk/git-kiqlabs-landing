@@ -1,8 +1,8 @@
 import { track } from "@/lib/fbpixel";
 
 export type LeadPayload = {
-  /** Источник заявки: какая форма её отправила. */
-  source: "contact" | "quiz";
+  /** Источник заявки: какая форма её отправила ("contact", "quiz", "region-kz" …). */
+  source: string;
   name?: string;
   company?: string;
   email?: string;

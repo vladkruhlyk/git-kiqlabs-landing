@@ -6,6 +6,7 @@ import { Check, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { dict } from "@/lib/i18n";
 import { submitLead } from "@/lib/lead";
+import { TelegramChannelCTA } from "@/components/ui/telegram-cta";
 import type { Region } from "@/lib/regions";
 
 export function RegionForm({ region }: { region: Region }) {
@@ -67,6 +68,7 @@ export function RegionForm({ region }: { region: Region }) {
         <p className="mt-3 max-w-md text-[15px] text-[var(--color-stone-soft)] leading-relaxed">
           {t.thanks.body}
         </p>
+        <TelegramChannelCTA lang={region.lang} className="mt-7 max-w-md" />
       </motion.div>
     );
   }

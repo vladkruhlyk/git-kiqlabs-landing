@@ -21,6 +21,7 @@ import { useLang } from "@/components/ui/lang-provider";
 import type { Dictionary } from "@/lib/i18n";
 import { LangToggle } from "@/components/ui/lang-toggle";
 import { submitLead } from "@/lib/lead";
+import { TelegramChannelCTA } from "@/components/ui/telegram-cta";
 
 type Answers = {
   role?: string;
@@ -627,9 +628,11 @@ function ThankYou({ answers }: { answers: Answers }) {
         {t.quiz.thanks.body}
       </p>
 
+      <TelegramChannelCTA lang={lang} className="mt-8 mx-auto max-w-md" />
+
       <a
         href={lang === "en" ? "/en" : "/"}
-        className="mt-10 inline-block font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-stone-soft)] hover:text-[var(--color-bone)] transition-colors"
+        className="mt-8 inline-block font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-stone-soft)] hover:text-[var(--color-bone)] transition-colors"
       >
         {t.quiz.thanks.backToSite}
       </a>

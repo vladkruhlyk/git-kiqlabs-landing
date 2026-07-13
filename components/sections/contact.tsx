@@ -5,6 +5,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useLang } from "@/components/ui/lang-provider";
 import { submitLead } from "@/lib/lead";
+import { TelegramChannelCTA } from "@/components/ui/telegram-cta";
 
 export function Contact() {
   const [submitted, setSubmitted] = useState(false);
@@ -103,6 +104,7 @@ export function Contact() {
                 <p className="mt-4 max-w-md text-[15px] text-[var(--color-stone-soft)] leading-relaxed">
                   {t.contact.success.body}
                 </p>
+                <TelegramChannelCTA lang={lang} className="mt-8 max-w-md" />
               </motion.div>
             ) : (
               <form

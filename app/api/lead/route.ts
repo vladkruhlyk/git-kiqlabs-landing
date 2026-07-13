@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
+import { notify } from "@/lib/notify";
 
 export const runtime = "nodejs";
 // Заявки нельзя кэшировать / пре-рендерить.
@@ -46,6 +47,11 @@ export async function POST(req: Request) {
   // Бэкап: всегда пишем заявку в лог сервера.
   console.log("[lead]", JSON.stringify(lead));
 
+  // Уведомление о конверсии (Telegram / Sheets / webhook) — после ответа,
+  // не блокируя и не ломая сабмит. Срабатывает всегда, даже если CRM/вебхук
+  // не настроены.
+  after(() => notifyNewLead(data));
+
   // Шлём во все настроенные получатели параллельно.
   const tasks: { name: string; run: () => Promise<boolean> }[] = [];
   if (process.env.LEAD_WEBHOOK_URL) {
@@ -70,6 +76,42 @@ export async function POST(req: Request) {
   return NextResponse.json(
     { ok: anyOk, delivered },
     { status: anyOk ? 200 : 502 },
+  );
+}
+
+/** Человекочитаемый источник заявки для уведомления. */
+function sourceLabel(source: unknown): string {
+  const s = str(source);
+  if (s === "quiz") return "Квиз";
+  if (s === "contact") return "Форма контактов";
+  if (s.startsWith("region-")) {
+    return `Гео-лендинг (${s.replace("region-", "").toUpperCase()})`;
+  }
+  return s || "Сайт";
+}
+
+/** Рассылает уведомление о новой заявке (Telegram / Sheets / webhook). */
+function notifyNewLead(data: LeadBody): Promise<void> {
+  return notify(
+    "🆕 Новая заявка с сайта",
+    {
+      Источник: sourceLabel(data.source),
+      Имя: str(data.name),
+      Компания: str(data.company),
+      Email: str(data.email),
+      "Телефон/Telegram": str(data.phone),
+      Страна: str(data.country),
+      "Тип бизнеса": str(data.role),
+      Категории: str(data.categories),
+      Объём: str(data.volume),
+      "Тип запроса": str(data.inquiry),
+      Сообщение: str(data.message),
+      Страница: str(data.page),
+    },
+    {
+      // Дедуп: повторный POST с теми же контактами не задублирует уведомление.
+      eventId: `lead:${str(data.source)}:${str(data.email)}:${str(data.phone)}:${str(data.name)}`,
+    },
   );
 }
 

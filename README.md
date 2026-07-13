@@ -23,29 +23,66 @@ Open <http://localhost:3000>.
 
 ## Заявки (webhook) и Meta Pixel
 
-Формы (контакты + квиз) шлют заявку на серверный роут `app/api/lead/route.ts`,
-который **параллельно** доставляет её во все настроенные получатели:
-1. напрямую в **KeyCRM** (создаёт карточку в воронке) — если задан `KEYCRM_API_TOKEN`;
-2. на **webhook** (Make / Zapier / n8n → Google Sheets) — если задан `LEAD_WEBHOOK_URL`.
+Формы (контакты + квиз + гео-лендинги) шлют заявку на серверный роут
+`app/api/lead/route.ts`, который **параллельно** доставляет её во все настроенные
+получатели (каждый включается только своей env-переменной):
+1. напрямую в **KeyCRM** — создаёт карточку в воронке (`KEYCRM_API_TOKEN`);
+2. **уведомление о событии** через `lib/notify` — напрямую в **Telegram**
+   (`TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID`), в **Google Sheets** через Apps
+   Script (`GOOGLE_SHEETS_WEBHOOK_URL`) и в любой **доп. вебхук**
+   (`GENERIC_WEBHOOK_URL`);
+3. legacy **Make-вебхук** (`LEAD_WEBHOOK_URL`) — форвардит всю заявку + `keycrm_data`.
 
-Доставки независимы. Meta Pixel отслеживает `PageView` и событие `Lead` (только
-после успешной доставки хотя бы в один получатель). Токен KeyCRM — только на
-сервере (без `NEXT_PUBLIC_`), в браузер не попадает.
+Доставки независимы (`Promise.allSettled`), падение одной не влияет на другие и
+не ломает ответ. Meta Pixel шлёт `PageView` и `Lead` (после успешной доставки).
+Секреты — только на сервере (без `NEXT_PUBLIC_`).
 
 Настраивается через `.env.local` (на проде — переменные окружения хостинга):
 
 ```bash
-# KeyCRM — прямое создание карточек. Токен СЕКРЕТНЫЙ (без NEXT_PUBLIC_).
+# KeyCRM — прямое создание карточек. Токен СЕКРЕТНЫЙ.
 KEYCRM_API_TOKEN=xxxxxxxx
 KEYCRM_PIPELINE_ID=1     # опц.: id воронки (по умолчанию — первая)
 KEYCRM_SOURCE_ID=3       # опц.: id источника
-# KEYCRM_API_URL=...     # опц.: переопределить эндпоинт (для тестов)
 
-# Webhook для Google Sheets (опц.)
-LEAD_WEBHOOK_URL=https://hook.eu2.make.com/xxxxxxxx
+# Уведомления в Telegram (напрямую, официальный Bot API)
+TELEGRAM_BOT_TOKEN=123456:AA...
+TELEGRAM_CHAT_ID=-1001234567890    # супергруппа/канал: формат -100…
+NOTIFY_TIMEZONE=Europe/Kyiv        # часовой пояс метки времени
+
+GOOGLE_SHEETS_WEBHOOK_URL=         # опц.: Apps Script Web App → Sheets
+GENERIC_WEBHOOK_URL=               # опц.: любой доп. вебхук
+LEAD_WEBHOOK_URL=                  # опц.: legacy Make-вебхук
 
 # Meta Pixel ID из Events Manager
 NEXT_PUBLIC_FB_PIXEL_ID=1234567890123456
+```
+
+### Уведомления `lib/notify`
+
+Универсальный модуль: `notify(eventTitle, fields, opts?)` — `fields` это
+произвольные пары «подпись → значение». Fire-and-forget, никогда не бросает
+исключений, таймаут 5с на запрос, дедуп по `opts.eventId`. Вызывается на сервере
+в момент реального события (`after()` в роуте — после ответа). Для новых событий
+(заказ, оплата) — просто вызвать `notify()` с другими `eventTitle`/`fields`.
+
+**Как получить `TELEGRAM_CHAT_ID`:** создайте бота у `@BotFather`, добавьте его
+в группу (для канала — сделайте админом). Затем либо напишите боту/в группу и
+откройте `https://api.telegram.org/bot<TOKEN>/getUpdates` — в ответе будет
+`chat.id`; либо добавьте в чат `@getidsbot`. У супергрупп/каналов id
+отрицательный, формата `-100…`. Бот обязан быть участником группы (или админом
+канала), иначе Telegram вернёт 403.
+
+**Google Sheets через Apps Script** (без Make): в таблице *Расширения → Apps
+Script* вставьте и опубликуйте как Web App («Все, у кого есть ссылка»), URL →
+`GOOGLE_SHEETS_WEBHOOK_URL`. Заголовки листа: `Время | Событие | …поля`.
+
+```js
+function doPost(e) {
+  const data = JSON.parse(e.postData.contents);
+  SpreadsheetApp.getActiveSheet().appendRow(data.row);
+  return ContentService.createTextOutput("ok");
+}
 ```
 
 Если ничего не задано — заявка принимается и пишется в лог сервера

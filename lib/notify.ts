@@ -88,17 +88,24 @@ export function buildTelegramText(
   return lines.join("\n");
 }
 
-/** JSON для Sheets/webhook: именованные поля + массив row в порядке колонок. */
+/**
+ * JSON для Sheets/webhook: именованные поля + массив row в порядке колонок.
+ * Для таблицы важна СТАБИЛЬНАЯ ширина строки — пустые поля не выкидываем,
+ * оставляем "", чтобы колонки не съезжали между заявками. Порядок берётся из
+ * opts.columns, иначе из порядка ключей fields.
+ */
 export function buildPayload(
   eventTitle: string,
   fields: NotifyFields,
   tz: string,
   columns?: string[],
 ) {
-  const clean = cleanFields(fields);
-  const named = Object.fromEntries(clean) as Record<string, string>;
+  const val = (v: FieldValue) =>
+    v === null || v === undefined ? "" : String(v).trim();
+  const order = columns ?? Object.keys(fields);
+  const named: Record<string, string> = {};
+  for (const label of order) named[label] = val(fields[label]);
   const time = formatTime(tz);
-  const order = columns ?? clean.map(([label]) => label);
   const row = [time, eventTitle, ...order.map((label) => named[label] ?? "")];
   return { event: eventTitle, time, fields: named, row };
 }

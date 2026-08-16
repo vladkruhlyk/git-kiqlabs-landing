@@ -21,7 +21,7 @@ export function RegionLanding({ region }: { region: Region }) {
   return (
     <main className="relative bg-[var(--color-bone)] text-[var(--color-ink)]">
       {/* ─── HERO (dark) ─── */}
-      <section className="relative overflow-hidden bg-[var(--color-ink)] text-[var(--color-bone)]">
+      <section className="relative flex min-h-[100svh] flex-col overflow-hidden bg-[var(--color-ink)] text-[var(--color-bone)] lg:block lg:min-h-0">
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
@@ -70,8 +70,8 @@ export function RegionLanding({ region }: { region: Region }) {
         </header>
 
         {/* Hero body */}
-        <div className="relative z-10 px-6 lg:px-10 py-10 lg:py-20">
-          <div className="mx-auto max-w-[1200px] grid grid-cols-12 gap-8 lg:gap-10 items-center">
+        <div className="relative z-10 flex flex-1 items-center px-6 py-4 lg:block lg:px-10 lg:py-20">
+          <div className="mx-auto grid w-full max-w-[1200px] grid-cols-12 items-center gap-3 sm:gap-8 lg:gap-10">
             <div className="col-span-12 lg:col-span-7 order-2 lg:order-1">
               <motion.div
                 initial={{ opacity: 0, y: 12 }}
@@ -92,7 +92,7 @@ export function RegionLanding({ region }: { region: Region }) {
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.08 }}
-                className="mt-5 font-display text-[32px] sm:text-[44px] lg:text-[56px] leading-[1.04] tracking-[-0.025em] text-balance"
+                className="mt-3 sm:mt-5 font-display text-[26px] sm:text-[44px] lg:text-[56px] leading-[1.06] sm:leading-[1.04] tracking-[-0.025em] text-balance"
               >
                 {c.heroTitle}{" "}
                 <span className="text-[var(--color-lime)]">{c.heroAccent}</span>
@@ -102,7 +102,7 @@ export function RegionLanding({ region }: { region: Region }) {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.18 }}
-                className="mt-6 max-w-[54ch] text-[15px] lg:text-[17px] text-[var(--color-stone-soft)] leading-relaxed"
+                className="mt-3 sm:mt-6 max-w-[54ch] text-[13px] sm:text-[15px] lg:text-[17px] text-[var(--color-stone-soft)] leading-snug sm:leading-relaxed line-clamp-3 sm:line-clamp-none"
               >
                 {c.heroSubtitle}
               </motion.p>
@@ -111,7 +111,7 @@ export function RegionLanding({ region }: { region: Region }) {
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.28 }}
-                className="mt-8 flex flex-wrap items-center gap-4"
+                className="mt-4 sm:mt-8 flex flex-wrap items-center gap-4"
               >
                 <a
                   href="#form"
@@ -129,7 +129,7 @@ export function RegionLanding({ region }: { region: Region }) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.7, delay: 0.4 }}
-                className="mt-10 flex flex-wrap gap-x-6 gap-y-2 border-t border-[var(--color-bone)]/10 pt-6 font-mono text-[11px] uppercase tracking-[0.16em] text-[var(--color-stone-soft)]"
+                className="mt-4 sm:mt-10 flex flex-wrap gap-x-4 sm:gap-x-6 gap-y-2 border-t border-[var(--color-bone)]/10 pt-4 sm:pt-6 font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.14em] sm:tracking-[0.16em] text-[var(--color-stone-soft)]"
               >
                 {c.triage.map((item) => (
                   <span key={item} className="inline-flex items-center gap-2">
@@ -142,7 +142,7 @@ export function RegionLanding({ region }: { region: Region }) {
 
             {/* Bottles */}
             <div className="col-span-12 lg:col-span-5 order-1 lg:order-2">
-              <div className="relative h-[240px] sm:h-[340px] lg:h-[440px] pointer-events-none">
+              <div className="relative h-[150px] sm:h-[320px] lg:h-[440px] pointer-events-none">
                 <div
                   aria-hidden
                   className="absolute inset-0"
@@ -151,9 +151,9 @@ export function RegionLanding({ region }: { region: Region }) {
                       "radial-gradient(50% 50% at 55% 50%, rgba(59,130,246,0.22), transparent 65%)",
                   }}
                 />
-                <Bottle b={BOTTLES[0]} className="absolute top-[6%] left-[6%] w-[42%] z-20" rotate={-6} delay={0.2} />
-                <Bottle b={BOTTLES[1]} className="absolute top-[2%] right-[8%] w-[40%] z-10" rotate={5} delay={0.32} />
-                <Bottle b={BOTTLES[2]} className="absolute bottom-[2%] left-[28%] w-[50%] z-30" rotate={-2} delay={0.44} />
+                <Bottle b={BOTTLES[0]} className="absolute top-[4%] left-[10%] w-[30%] sm:w-[42%] sm:left-[6%] z-20" rotate={-6} delay={0.2} />
+                <Bottle b={BOTTLES[1]} className="absolute top-[0%] right-[12%] w-[28%] sm:w-[40%] sm:right-[8%] z-10" rotate={5} delay={0.32} />
+                <Bottle b={BOTTLES[2]} className="absolute bottom-[0%] left-[34%] w-[36%] sm:w-[50%] sm:left-[28%] z-30" rotate={-2} delay={0.44} />
               </div>
             </div>
           </div>

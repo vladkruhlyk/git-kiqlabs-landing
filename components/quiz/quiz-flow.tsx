@@ -651,7 +651,7 @@ const INTRO_BOTTLES = [
 function Intro({ onStart }: { onStart: () => void }) {
   const { t, lang } = useLang();
   return (
-    <main className="relative min-h-screen bg-[var(--color-ink)] text-[var(--color-bone)] overflow-hidden">
+    <main className="relative flex min-h-[100svh] flex-col overflow-hidden bg-[var(--color-ink)] text-[var(--color-bone)] lg:block lg:min-h-screen">
       {/* Backgrounds */}
       <div
         aria-hidden
@@ -702,8 +702,8 @@ function Intro({ onStart }: { onStart: () => void }) {
       </header>
 
       {/* Hero block */}
-      <div className="relative z-10 px-6 lg:px-10 py-8 lg:py-14">
-        <div className="mx-auto max-w-[1240px] grid grid-cols-12 gap-8 lg:gap-10 items-center">
+      <div className="relative z-10 flex flex-1 flex-col justify-center px-6 py-4 lg:block lg:px-10 lg:py-14">
+        <div className="mx-auto grid w-full max-w-[1240px] grid-cols-12 items-center gap-3 sm:gap-8 lg:gap-10">
           {/* Left: copy + CTA (compact) */}
           <div className="col-span-12 lg:col-span-6 order-2 lg:order-1">
             <motion.div
@@ -732,7 +732,7 @@ function Intro({ onStart }: { onStart: () => void }) {
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.08, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-5 font-display text-[30px] sm:text-[38px] md:text-[44px] lg:text-[48px] xl:text-[56px] leading-[1.05] tracking-[-0.02em] text-balance"
+              className="mt-3 sm:mt-5 font-display text-[24px] sm:text-[38px] md:text-[44px] lg:text-[48px] xl:text-[56px] leading-[1.08] sm:leading-[1.05] tracking-[-0.02em] text-balance"
             >
               <span className="text-[var(--color-lime)]">
                 {t.quiz.intro.headline1}
@@ -744,7 +744,7 @@ function Intro({ onStart }: { onStart: () => void }) {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.18 }}
-              className="mt-5 text-[14px] lg:text-[16px] text-[var(--color-stone-soft)] leading-relaxed max-w-[52ch]"
+              className="mt-3 sm:mt-5 text-[13px] sm:text-[14px] lg:text-[16px] text-[var(--color-stone-soft)] leading-snug sm:leading-relaxed max-w-[52ch] line-clamp-2 sm:line-clamp-none"
             >
               {t.quiz.intro.description1}{" "}
               <span className="text-[var(--color-bone)] font-medium">
@@ -758,7 +758,7 @@ function Intro({ onStart }: { onStart: () => void }) {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.3 }}
-              className="mt-7 lg:mt-8 flex flex-wrap items-center gap-4"
+              className="mt-4 sm:mt-7 lg:mt-8 flex flex-wrap items-center gap-3 sm:gap-4"
             >
               <button
                 type="button"
@@ -788,7 +788,7 @@ function Intro({ onStart }: { onStart: () => void }) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.5 }}
-          className="mx-auto max-w-[1240px] mt-10 lg:mt-14 grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4"
+          className="mx-auto max-w-[1240px] mt-10 lg:mt-14 hidden grid-cols-2 gap-3 sm:grid lg:grid-cols-4 lg:gap-4"
         >
           {t.quiz.intro.perks.map((p) => (
             <div
@@ -807,7 +807,7 @@ function Intro({ onStart }: { onStart: () => void }) {
       </div>
 
       {/* Trust footer */}
-      <div className="relative z-10 px-6 lg:px-10 pb-10">
+      <div className="relative z-10 hidden px-6 pb-10 sm:block lg:px-10">
         <div className="mx-auto max-w-[1240px] pt-6 border-t border-[var(--color-bone)]/10 flex flex-wrap items-center justify-between gap-3 text-[11px] font-mono uppercase tracking-[0.18em] text-[var(--color-stone-soft)]">
           <span>{t.quiz.common.opt}</span>
           <span className="hidden sm:inline">{t.quiz.common.usEu}</span>
@@ -821,7 +821,7 @@ function Intro({ onStart }: { onStart: () => void }) {
 function IntroBottles() {
   const { t } = useLang();
   return (
-    <div className="relative h-[320px] sm:h-[440px] lg:h-[560px] pointer-events-none -mx-2 sm:mx-0">
+    <div className="relative h-[190px] sm:h-[400px] lg:h-[560px] pointer-events-none -mx-2 sm:mx-0">
       {/* Background glow */}
       <div
         aria-hidden
@@ -835,7 +835,7 @@ function IntroBottles() {
       {/* Bottle 1 — left */}
       <IntroBottle
         bottle={INTRO_BOTTLES[0]}
-        className="absolute top-[8%] left-[4%] w-[44%] sm:w-[42%] lg:w-[44%] z-20"
+        className="absolute top-[8%] left-[6%] w-[32%] sm:w-[42%] lg:w-[44%] z-20"
         rotate={-6}
         delay={0.2}
         floatDuration={5.4}
@@ -844,7 +844,7 @@ function IntroBottles() {
       {/* Bottle 2 — top-right */}
       <IntroBottle
         bottle={INTRO_BOTTLES[1]}
-        className="absolute top-[2%] right-[4%] w-[40%] sm:w-[38%] lg:w-[42%] z-10"
+        className="absolute top-[2%] right-[6%] w-[30%] sm:w-[38%] lg:w-[42%] z-10"
         rotate={5}
         delay={0.35}
         floatDuration={6.2}
@@ -853,7 +853,7 @@ function IntroBottles() {
       {/* Bottle 3 — front */}
       <IntroBottle
         bottle={INTRO_BOTTLES[2]}
-        className="absolute bottom-[2%] left-[26%] w-[52%] sm:w-[50%] lg:w-[52%] z-30"
+        className="absolute bottom-[2%] left-[34%] w-[38%] sm:w-[50%] lg:w-[52%] z-30"
         rotate={-2}
         delay={0.5}
         floatDuration={5.8}

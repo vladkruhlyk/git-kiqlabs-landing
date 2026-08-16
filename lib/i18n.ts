@@ -330,7 +330,7 @@ export const dict = {
     },
     quiz: {
       intro: {
-        eyebrowOpt: "Только опт · B2B",
+        eyebrowOpt: "B2B · опт от $5 000",
         eyebrowNoRetail: "Розница не обслуживается",
         headline1: "Витамины и спортпит",
         headline2: "оптом, напрямую с фабрик США и ЕС.",
@@ -791,7 +791,7 @@ export const dict = {
     },
     quiz: {
       intro: {
-        eyebrowOpt: "B2B · wholesale only",
+        eyebrowOpt: "B2B · wholesale from $5,000",
         eyebrowNoRetail: "No retail enquiries",
         headline1: "Vitamins and sports nutrition",
         headline2: "wholesale, direct from US & EU factories.",

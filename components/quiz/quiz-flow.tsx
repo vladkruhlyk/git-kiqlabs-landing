@@ -691,12 +691,6 @@ function Intro({ onStart }: { onStart: () => void }) {
           </a>
           <div className="flex items-center gap-3">
             <LangToggle inverted />
-            <a
-              href={lang === "en" ? "/en" : "/"}
-              className="font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--color-stone-soft)] hover:text-[var(--color-bone)] transition-colors"
-            >
-              {t.quiz.intro.backToSite}
-            </a>
           </div>
         </div>
       </header>
@@ -821,7 +815,7 @@ function Intro({ onStart }: { onStart: () => void }) {
 function IntroBottles() {
   const { t } = useLang();
   return (
-    <div className="relative h-[190px] sm:h-[400px] lg:h-[560px] pointer-events-none -mx-2 sm:mx-0">
+    <div className="relative h-[220px] sm:h-[420px] lg:h-[560px] pointer-events-none -mx-2 sm:mx-0">
       {/* Background glow */}
       <div
         aria-hidden
@@ -835,7 +829,7 @@ function IntroBottles() {
       {/* Bottle 1 — left */}
       <IntroBottle
         bottle={INTRO_BOTTLES[0]}
-        className="absolute top-[8%] left-[6%] w-[32%] sm:w-[42%] lg:w-[44%] z-20"
+        className="absolute top-[8%] left-[4%] w-[38%] sm:w-[44%] lg:w-[44%] z-20"
         rotate={-6}
         delay={0.2}
         floatDuration={5.4}
@@ -844,7 +838,7 @@ function IntroBottles() {
       {/* Bottle 2 — top-right */}
       <IntroBottle
         bottle={INTRO_BOTTLES[1]}
-        className="absolute top-[2%] right-[6%] w-[30%] sm:w-[38%] lg:w-[42%] z-10"
+        className="absolute top-[2%] right-[4%] w-[36%] sm:w-[40%] lg:w-[42%] z-10"
         rotate={5}
         delay={0.35}
         floatDuration={6.2}
@@ -853,7 +847,7 @@ function IntroBottles() {
       {/* Bottle 3 — front */}
       <IntroBottle
         bottle={INTRO_BOTTLES[2]}
-        className="absolute bottom-[2%] left-[34%] w-[38%] sm:w-[50%] lg:w-[52%] z-30"
+        className="absolute bottom-[2%] left-[30%] w-[46%] sm:w-[52%] lg:w-[52%] z-30"
         rotate={-2}
         delay={0.5}
         floatDuration={5.8}
@@ -922,7 +916,7 @@ function IntroBottle({
       className={className}
     >
       <motion.div
-        animate={{ y: [0, -14, 0], rotate: [rotate, rotate + 1.5, rotate] }}
+        animate={{ y: [0, -22, 0], rotate: [rotate, rotate + 2.5, rotate] }}
         transition={{
           duration: floatDuration,
           delay: floatDelay,

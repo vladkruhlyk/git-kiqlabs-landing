@@ -182,11 +182,7 @@ export function QuizFlow() {
       {/* Header */}
       <header className="relative z-10 px-6 lg:px-10 pt-6 lg:pt-8">
         <div className="mx-auto max-w-[1080px] flex items-center justify-between gap-4">
-          <a
-            href={lang === "en" ? "/en" : "/"}
-            className="group flex items-center"
-            aria-label="KIQ Labs"
-          >
+          <div className="flex items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/media/logo-light.webp"
@@ -194,7 +190,7 @@ export function QuizFlow() {
               className="h-9 lg:h-10 w-auto select-none"
               draggable={false}
             />
-          </a>
+          </div>
           <div className="flex items-center gap-3 text-[11px] font-mono uppercase tracking-[0.2em] text-[var(--color-stone-soft)]">
             <LangToggle inverted />
             <span>
@@ -649,7 +645,7 @@ const INTRO_BOTTLES = [
 ];
 
 function Intro({ onStart }: { onStart: () => void }) {
-  const { t, lang } = useLang();
+  const { t } = useLang();
   return (
     <main className="relative flex min-h-[100svh] flex-col overflow-hidden bg-[var(--color-ink)] text-[var(--color-bone)] lg:block lg:min-h-screen">
       {/* Backgrounds */}
@@ -676,11 +672,7 @@ function Intro({ onStart }: { onStart: () => void }) {
       {/* Header */}
       <header className="relative z-10 px-6 lg:px-10 pt-6 lg:pt-8">
         <div className="mx-auto max-w-[1240px] flex items-center justify-between gap-4">
-          <a
-            href={lang === "en" ? "/en" : "/"}
-            className="group flex items-center"
-            aria-label="KIQ Labs"
-          >
+          <div className="flex items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/media/logo-light.webp"
@@ -688,7 +680,7 @@ function Intro({ onStart }: { onStart: () => void }) {
               className="h-9 lg:h-10 w-auto select-none"
               draggable={false}
             />
-          </a>
+          </div>
           <div className="flex items-center gap-3">
             <LangToggle inverted />
           </div>

@@ -106,7 +106,6 @@ function notifyNewLead(data: LeadBody): Promise<void> {
       Объём: str(data.volume),
       "Тип запроса": str(data.inquiry),
       Сообщение: str(data.message),
-      Страница: str(data.page),
     },
     {
       // Дедуп: повторный POST с теми же контактами не задублирует уведомление.

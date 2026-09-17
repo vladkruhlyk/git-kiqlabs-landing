@@ -53,7 +53,7 @@ export function B2BForm() {
         <div className="mt-5 font-mono text-[11px] uppercase tracking-[0.22em] text-[var(--color-grass)]">
           Заявка принята
         </div>
-        <h3 className="mt-2 font-display text-[24px] lg:text-[30px] leading-tight">
+        <h3 className="mt-2 font-sans font-bold text-[24px] lg:text-[28px] leading-tight tracking-[-0.02em]">
           {name ? `Спасибо, ${name}!` : "Спасибо!"}
         </h3>
         <p className="mt-3 max-w-md text-[15px] text-[var(--color-ink-soft)] leading-relaxed">

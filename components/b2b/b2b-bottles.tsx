@@ -18,7 +18,18 @@ const FLOAT = [
 
 export function B2BBottles() {
   return (
-    <div className="relative flex items-end justify-center px-5 pb-9 pt-20 sm:px-8 sm:pb-10 sm:pt-24">
+    <div className="relative flex items-end justify-center px-5 pb-9 pt-12 sm:px-8 sm:pb-10 sm:pt-14">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0"
+        style={{
+          backgroundImage: "radial-gradient(var(--color-grass) 1px, transparent 1px)",
+          backgroundSize: "22px 22px",
+          opacity: 0.06,
+          maskImage: "radial-gradient(70% 60% at 50% 40%, #000, transparent)",
+          WebkitMaskImage: "radial-gradient(70% 60% at 50% 40%, #000, transparent)",
+        }}
+      />
       {BOTTLES.map((b, i) => (
         <motion.img
           key={b.src}

@@ -83,6 +83,7 @@ export async function POST(req: Request) {
 function sourceLabel(source: unknown): string {
   const s = str(source);
   if (s === "quiz") return "Квиз";
+  if (s === "b2b") return "B2B-лендинг";
   if (s === "contact") return "Форма контактов";
   if (s.startsWith("region-")) {
     return `Гео-лендинг (${s.replace("region-", "").toUpperCase()})`;

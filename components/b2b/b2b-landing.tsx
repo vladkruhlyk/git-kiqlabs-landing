@@ -1,11 +1,6 @@
 import { ArrowRight, Check, X, Factory, FileCheck2, Truck } from "lucide-react";
 import { B2BForm } from "./b2b-form";
-
-const BOTTLES = [
-  { src: "/media/photo1.png", alt: "OstroVit Omega 3" },
-  { src: "/media/photo2.png", alt: "OstroVit Biotin Plus" },
-  { src: "/media/photo3.png", alt: "OstroVit Triple Zinc" },
-];
+import { B2BBottles } from "./b2b-bottles";
 
 const WORK_WITH = [
   "Дистрибьюторы и оптовики",
@@ -135,20 +130,7 @@ export function B2BLanding() {
                   "linear-gradient(160deg, #eaf0fb 0%, #f5f7fa 55%, #ffffff 100%)",
               }}
             >
-              <div className="relative flex items-end justify-center px-8 pb-10 pt-14 sm:px-12 sm:pb-12 sm:pt-16">
-                {BOTTLES.map((b, i) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    key={b.src}
-                    src={b.src}
-                    alt={b.alt}
-                    className={`object-contain object-bottom drop-shadow-[0_16px_22px_rgba(18,23,42,0.18)] ${
-                      i === 1 ? "z-30 w-[42%] -mx-[4%]" : "z-10 w-[32%]"
-                    }`}
-                    draggable={false}
-                  />
-                ))}
-              </div>
+              <B2BBottles />
             </div>
             <div className="absolute -top-3 left-5 rounded-xl bg-[var(--color-ink)] px-4 py-2.5 text-[var(--color-bone)] shadow-[0_12px_30px_rgba(18,23,42,0.25)]">
               <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--color-stone-soft)]">

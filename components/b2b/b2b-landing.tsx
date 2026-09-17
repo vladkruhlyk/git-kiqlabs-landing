@@ -129,28 +129,30 @@ export function B2BLanding() {
           {/* Photo panel */}
           <div className="relative">
             <div
-              className="relative flex items-end justify-center gap-2 overflow-hidden rounded-3xl border border-[var(--color-line)] px-4 pt-10 sm:gap-4 sm:px-8"
+              className="relative overflow-hidden rounded-3xl border border-[var(--color-line)]"
               style={{
                 background:
-                  "linear-gradient(160deg, #eef2fb 0%, #f7f8fa 60%, #ffffff 100%)",
+                  "linear-gradient(160deg, #eaf0fb 0%, #f5f7fa 55%, #ffffff 100%)",
               }}
             >
-              {BOTTLES.map((b, i) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  key={b.src}
-                  src={b.src}
-                  alt={b.alt}
-                  className={`h-auto w-1/3 object-contain drop-shadow-[0_18px_28px_rgba(18,23,42,0.16)] ${
-                    i === 1 ? "-mb-2 w-[38%]" : "mb-4"
-                  }`}
-                  draggable={false}
-                />
-              ))}
+              <div className="relative flex items-end justify-center px-8 pb-10 pt-14 sm:px-12 sm:pb-12 sm:pt-16">
+                {BOTTLES.map((b, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={b.src}
+                    src={b.src}
+                    alt={b.alt}
+                    className={`object-contain object-bottom drop-shadow-[0_16px_22px_rgba(18,23,42,0.18)] ${
+                      i === 1 ? "z-30 w-[42%] -mx-[4%]" : "z-10 w-[32%]"
+                    }`}
+                    draggable={false}
+                  />
+                ))}
+              </div>
             </div>
-            <div className="absolute left-4 top-4 rounded-lg bg-[var(--color-ink)] px-3 py-2 text-[var(--color-bone)] shadow-lg sm:left-6 sm:top-6">
+            <div className="absolute -top-3 left-5 rounded-xl bg-[var(--color-ink)] px-4 py-2.5 text-[var(--color-bone)] shadow-[0_12px_30px_rgba(18,23,42,0.25)]">
               <div className="text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--color-stone-soft)]">
-                Бренды US & EU
+                Бренды US &amp; EU
               </div>
               <div className="text-[14px] font-semibold">OstroVit · и другие</div>
             </div>
@@ -233,13 +235,18 @@ export function B2BLanding() {
           <h2 className={`${H} text-[26px] lg:text-[32px] leading-tight`}>
             Как это работает
           </h2>
-          <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {STEPS.map((s) => (
-              <div key={s.n}>
-                <div className="text-[13px] font-bold text-[var(--color-grass)]">
-                  {s.n}
+          <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+            {STEPS.map((s, i) => (
+              <div key={s.title} className="relative rounded-2xl border border-[var(--color-line)] bg-[var(--color-bone)] p-6">
+                <div className="flex items-center gap-3">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[var(--color-ink)] text-[14px] font-bold text-[var(--color-bone)]">
+                    {i + 1}
+                  </span>
+                  {i < STEPS.length - 1 && (
+                    <span className="hidden h-px flex-1 bg-[var(--color-stone-soft)]/60 lg:block" />
+                  )}
                 </div>
-                <h3 className="mt-2 text-[17px] font-semibold leading-tight">
+                <h3 className="mt-4 text-[17px] font-semibold leading-tight">
                   {s.title}
                 </h3>
                 <p className="mt-2 text-[14px] text-[var(--color-ink-soft)] leading-relaxed">

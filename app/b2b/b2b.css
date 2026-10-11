@@ -141,6 +141,17 @@
   }
 }
 
+@keyframes b2b-screen-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @layer components {
   /* Заголовки: на мобиле — нижняя граница системы (38px), на десктопе 50px.
      Hero выше 50px не поднимаем: длинные русские слова в половине ширины
@@ -173,6 +184,16 @@
     .b2b .b2b-lead {
       font-size: var(--text-body-lg);
       line-height: var(--leading-body-lg);
+    }
+  }
+
+  /* Смена экранов квиза: лёгкое появление 200 мс, без JS-библиотек. */
+  .b2b .b2b-screen-in {
+    animation: b2b-screen-in 200ms ease-out both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .b2b .b2b-screen-in {
+      animation: none;
     }
   }
 

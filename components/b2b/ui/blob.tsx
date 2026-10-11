@@ -25,15 +25,19 @@ export function Blob({ color, className }: { color: "magenta" | "cyan"; classNam
  */
 export function BlobbedVisual({
   className,
+  desktopOnly,
   children,
 }: {
   className?: string;
+  /** Пятна только на десктопе (например, вокруг карточки квиза). */
+  desktopOnly?: boolean;
   children: React.ReactNode;
 }) {
+  const vis = desktopOnly ? "hidden lg:block" : "";
   return (
     <div className={cn("relative", className)}>
-      <Blob color="magenta" className="-right-6 -top-8 size-40 lg:-right-10 lg:size-56" />
-      <Blob color="cyan" className="-bottom-8 -left-6 size-44 lg:-left-10 lg:size-64" />
+      <Blob color="magenta" className={cn("-right-6 -top-8 size-40 lg:-right-10 lg:size-56", vis)} />
+      <Blob color="cyan" className={cn("-bottom-8 -left-6 size-44 lg:-left-10 lg:size-64", vis)} />
       <div className="relative">{children}</div>
     </div>
   );

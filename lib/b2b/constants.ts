@@ -54,3 +54,23 @@ export const BRANDS = [
 
 /** Тег заявки с объёмом ниже минимального заказа. */
 export const TAG_LOW_VOLUME = "low_volume";
+
+/* ─────────── Квиз /b2b/quiz ─────────── */
+
+/** «Кто вы?» — последний вариант уводит на экран отсева розницы. */
+export const QUIZ_RETAIL = "Покупаю для себя";
+export const QUIZ_ROLES = [
+  "Дистрибьютор",
+  "Аптечная сеть",
+  "Интернет-магазин или селлер маркетплейса",
+  "Private Label",
+  QUIZ_RETAIL,
+] as const;
+
+/** Категории с формами для заголовка «маржу по [категориям]». */
+export const QUIZ_CATEGORIES = [
+  { label: "Спортивное питание", dative: "спортивному питанию", short: "спортпиту" },
+  { label: "Витамины и минералы", dative: "витаминам и минералам", short: "витаминам" },
+  { label: "Клинические БАДы", dative: "клиническим БАДам", short: "клиническим БАДам" },
+  { label: "Private Label", dative: "Private Label", short: "Private Label" },
+] as const;

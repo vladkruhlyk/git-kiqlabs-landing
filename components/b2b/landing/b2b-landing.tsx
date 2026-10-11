@@ -13,7 +13,8 @@ import {
   TopStrip,
 } from "@/components/b2b/ui/chrome";
 import { StickyBar } from "@/components/b2b/ui/sticky-bar";
-import { BottleGroup } from "@/components/b2b/ui/bottles";
+import { BottleGroup, ProductShelf } from "@/components/b2b/ui/bottles";
+import { Blob } from "@/components/b2b/ui/blob";
 import { EMAIL, FACTS } from "@/lib/b2b/constants";
 import { PriceListMockup } from "./price-list-mockup";
 import { DossierMockup } from "./dossier-mockup";
@@ -96,19 +97,37 @@ export function B2BLanding() {
               </ul>
             </div>
             {/* Коллаж: прайс-лист и банки поверх его нижнего правого угла. */}
-            <div className="relative pb-24 sm:pb-12 lg:pb-14">
+            <div className="relative pb-32 sm:pb-16 lg:pb-20">
               <PriceListMockup />
               <BottleGroup
                 eager
-                className="absolute bottom-0 right-1 w-[54%] sm:-bottom-2 sm:right-0 sm:w-[44%] lg:-right-6 lg:w-[48%]"
+                ids={["omega-3", "triple-zinc", "biotin-plus"]}
+                className="absolute bottom-0 right-1 w-[64%] sm:-bottom-2 sm:right-0 sm:w-[54%] lg:-right-10 lg:w-[60%]"
               />
             </div>
           </Container>
         </section>
 
-        {/* ─── Бренды ─── */}
+        {/* ─── Бренды и полка ─── */}
         <Section className="py-8 lg:py-10">
           <LogoStrip caption={`${FACTS.brands} брендов с прямыми контрактами`} />
+          <div className="relative mt-12 lg:mt-16">
+            <Blob color="cyan" className="-top-6 left-[8%] size-40 lg:size-56" />
+            <Blob color="magenta" className="right-[10%] top-2 size-36 lg:size-52" />
+            <ProductShelf
+              ids={[
+                "creatine",
+                "vitamin-d3",
+                "omega-3",
+                "triple-zinc",
+                "marine-collagen",
+                "magnesium-glycinate",
+                "biotin-plus",
+                "wpc80",
+              ]}
+              mobile={["creatine", "vitamin-d3", "triple-zinc", "marine-collagen"]}
+            />
+          </div>
         </Section>
 
         {/* ─── Цифры ─── */}
@@ -184,8 +203,13 @@ export function B2BLanding() {
                 ))}
               </ul>
             </div>
-            <div className="lg:order-1">
+            <div className="relative pb-16 lg:order-1 lg:pb-24">
               <DossierMockup />
+              {/* Банки перед нижними (размытыми) строками досье. */}
+              <BottleGroup
+                ids={["magnesium-glycinate", "vitamin-d3"]}
+                className="absolute bottom-0 right-2 w-[44%] sm:w-[34%] lg:-right-8 lg:w-[34%]"
+              />
             </div>
           </div>
         </Section>
@@ -225,7 +249,15 @@ export function B2BLanding() {
                 </a>
               </div>
             </div>
-            <OfficesCard />
+            <div className="relative">
+              <OfficesCard />
+              {/* Пакеты и банка — в правой (пустой) части строк, над подвалом карточки. */}
+              <BottleGroup
+                ids={["creatine", "wpc80", "marine-collagen"]}
+                sizes={["z-10 w-[36%] -mr-[8%]", "z-20 w-[40%]", "z-10 w-[34%] -ml-[8%]"]}
+                className="absolute bottom-[64px] right-1 w-[50%] sm:w-[44%] lg:-right-10 lg:w-[50%]"
+              />
+            </div>
           </div>
         </Section>
 

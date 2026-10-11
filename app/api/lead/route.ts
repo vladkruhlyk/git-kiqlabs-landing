@@ -62,7 +62,6 @@ export async function POST(req: Request) {
   // Квалификация решается только на сервере (правило — lib/b2b/qualify.ts).
   const qualifiedByRules = isQualifiedLead(source, {
     volume: str(data.volume),
-    bin: str(data.bin),
     tags: str(data.tags),
     role: str(data.role),
   });

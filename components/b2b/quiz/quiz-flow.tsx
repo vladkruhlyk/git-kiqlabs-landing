@@ -436,8 +436,8 @@ function StartScreen({
 
 /* ─────────── Финал: бронь звонка ─────────── */
 
-type FinalErrors = Partial<Record<"company" | "bin" | "name" | "phone" | "email", string>>;
-const FINAL_ORDER = ["company", "bin", "name", "phone", "email"] as const;
+type FinalErrors = Partial<Record<"company" | "name" | "email" | "phone", string>>;
+const FINAL_ORDER = ["company", "name", "email", "phone"] as const;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 function FinalStep({
@@ -458,7 +458,6 @@ function FinalStep({
   const c = country && country !== "other" ? COUNTRIES[country] : undefined;
 
   const [company, setCompany] = useState("");
-  const [bin, setBin] = useState("");
   const [name, setName] = useState("");
   // Код телефона: страна из ответа квиза, иначе — по часовому поясу браузера.
   const [dial, setDial] = useState<DialChoice>(c?.code ?? detectCountry() ?? "other");
@@ -474,7 +473,6 @@ function FinalStep({
     if (status === "sending") return;
     const e: FinalErrors = {};
     if (!company.trim()) e.company = "Укажите название компании";
-    if (bin.trim().length < 5) e.bin = "Укажите БИН, ИНН или регистрационный номер";
     if (name.trim().length < 2) e.name = "Укажите имя";
     if (!isPhoneValid(dial, phone)) e.phone = "Проверьте номер телефона";
     if (!EMAIL_RE.test(email.trim())) e.email = "Укажите рабочий email";
@@ -501,7 +499,6 @@ function FinalStep({
       countryCode: c?.code ?? "",
       tags: volume === LOW_VOLUME ? TAG_LOW_VOLUME : "",
       company: company.trim(),
-      bin: bin.trim(),
       name: name.trim(),
       phone: fullPhone(dial, phone),
       email: email.trim(),
@@ -536,17 +533,6 @@ function FinalStep({
             }}
           />
         </Field>
-        <Field label="БИН / ИНН" htmlFor="qf-bin" error={errors.bin}>
-          <Input
-            id="qf-bin"
-            value={bin}
-            invalid={!!errors.bin}
-            onChange={(e) => {
-              setBin(e.target.value);
-              clear("bin");
-            }}
-          />
-        </Field>
         <Field label="Имя" htmlFor="qf-name" error={errors.name}>
           <Input
             id="qf-name"
@@ -573,7 +559,7 @@ function FinalStep({
             }}
           />
         </Field>
-        <Field label="Телефон" htmlFor="qf-phone" error={errors.phone} className="sm:col-span-2">
+        <Field label="Телефон" htmlFor="qf-phone" error={errors.phone}>
           <PhoneInput
             id="qf-phone"
             dial={dial}

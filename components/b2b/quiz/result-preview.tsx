@@ -1,6 +1,7 @@
 import { Calculator } from "lucide-react";
 import { Badge, Card } from "@/components/b2b/ui/card";
 import { BlobbedVisual } from "@/components/b2b/ui/blob";
+import { FACTS } from "@/lib/b2b/constants";
 
 const ROWS = [
   { label: "Закупочная цена", value: "$18 420" },
@@ -8,8 +9,11 @@ const ROWS = [
   { label: "Ваша маржа на полке", value: "41%" },
 ];
 
-/** Превью итогового расчёта на стартовом экране квиза (цифры размыты). */
-export function ResultPreview({ countryName }: { countryName: string }) {
+/**
+ * Превью итогового расчёта на стартовом экране квиза (цифры размыты).
+ * Без страны — общий вариант; страна подставляется только из ?country=.
+ */
+export function ResultPreview({ countryName }: { countryName?: string }) {
   return (
     <BlobbedVisual className="mx-auto w-full max-w-[480px]">
       <Card variant="product">
@@ -21,7 +25,9 @@ export function ResultPreview({ countryName }: { countryName: string }) {
             <div className="text-[12px] font-medium leading-[1.5] text-[var(--color-slate-gray)]">
               Ваш расчёт
             </div>
-            <div className="truncate text-[16px] font-semibold leading-[1.4]">Закупка · {countryName}</div>
+            <div className="truncate text-[16px] font-semibold leading-[1.4]">
+              Закупка · {countryName ?? "Опт · USD"}
+            </div>
           </div>
         </div>
         <dl className="divide-y divide-[var(--color-hairline)] text-[14px] leading-[1.4]">
@@ -30,8 +36,8 @@ export function ResultPreview({ countryName }: { countryName: string }) {
             <dd className="text-right font-semibold">Спортпит, витамины</dd>
           </div>
           <div className="flex items-center justify-between gap-3 px-5 py-3.5">
-            <dt className="text-[var(--color-slate-gray)]">Страна</dt>
-            <dd className="font-semibold">{countryName}</dd>
+            <dt className="text-[var(--color-slate-gray)]">{countryName ? "Страна" : "Поставка"}</dt>
+            <dd className="font-semibold">{countryName ?? FACTS.shipping}</dd>
           </div>
           <div className="flex items-center justify-between gap-3 bg-[var(--color-badge-fill)]/40 px-5 py-3.5">
             <dt className="text-[var(--color-slate-gray)]">Экономия к рынку</dt>

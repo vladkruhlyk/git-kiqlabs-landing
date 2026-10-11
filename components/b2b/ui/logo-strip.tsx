@@ -11,8 +11,9 @@ function logoSize(ratio: number) {
 }
 
 /**
- * Trust Logo Strip: монохромные логотипы в Mist Gray прямо на холсте, без
- * карточки и рамки. SVG используются как маска, поэтому цвет у всех один.
+ * Лента логотипов брендов прямо на холсте, без карточки и рамки.
+ * Логотипы в родных цветах (по просьбе владельца — отступление от монохромной
+ * Trust Logo Strip из DESIGN.md); белые SVG перекрашиваются маской в tint.
  */
 export function LogoStrip({ caption }: { caption: string }) {
   return (
@@ -26,27 +27,40 @@ export function LogoStrip({ caption }: { caption: string }) {
             return (
               <li
                 key={b.name}
-                className="whitespace-nowrap text-[15px] font-bold leading-none text-[var(--color-mist-gray)] lg:text-[19px]"
+                className="whitespace-nowrap text-[15px] font-bold leading-none text-[var(--color-ink-navy)] lg:text-[19px]"
               >
                 {b.name}
               </li>
             );
           }
           const { w, h } = logoSize(b.ratio);
-          const mask = `url(${b.logo}) center / contain no-repeat`;
+          // --k: на мобиле логотипы на 18% мельче, в раскладке тоже (не transform).
+          const size = { width: `calc(${w}px * var(--k))`, height: `calc(${h}px * var(--k))` };
+          if (b.tint) {
+            const mask = `url(${b.logo}) center / contain no-repeat`;
+            return (
+              <li key={b.name} className="[--k:0.82] lg:[--k:1]">
+                <span
+                  role="img"
+                  aria-label={b.name}
+                  className="block"
+                  style={{ ...size, background: b.tint, WebkitMask: mask, mask }}
+                />
+              </li>
+            );
+          }
           return (
-            // --k: на мобиле логотипы на 18% мельче, в раскладке тоже (не transform).
             <li key={b.name} className="[--k:0.82] lg:[--k:1]">
-              <span
-                role="img"
-                aria-label={b.name}
-                className="block bg-[var(--color-mist-gray)]"
-                style={{
-                  width: `calc(${w}px * var(--k))`,
-                  height: `calc(${h}px * var(--k))`,
-                  WebkitMask: mask,
-                  mask,
-                }}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={b.logo}
+                alt={b.name}
+                width={w}
+                height={h}
+                loading="lazy"
+                decoding="async"
+                className="block object-contain"
+                style={size}
               />
             </li>
           );

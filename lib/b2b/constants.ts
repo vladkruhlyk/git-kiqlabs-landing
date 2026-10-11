@@ -40,21 +40,25 @@ export const GUIDE_BUSINESS_TYPES = [
 
 /**
  * Бренды для ленты логотипов. logo — SVG в public/media/brands (с официальных
- * сайтов брендов), ratio — ширина/высота его viewBox. Без logo бренд выводится
- * названием: чтобы подключить логотип, положите SVG и впишите путь и ratio.
+ * сайтов брендов), ratio — ширина/высота его viewBox. Логотипы выводятся в
+ * родных цветах; tint — для белых SVG (рассчитаны на тёмную шапку своего сайта):
+ * такой логотип перекрашивается в один цвет, иначе на светлом фоне его не видно.
+ * Без logo бренд выводится названием.
  */
-export type Brand = { name: string; logo?: string; ratio?: number };
+export type Brand = { name: string; logo?: string; ratio?: number; tint?: string };
+
+const LOGO_INK = "var(--color-carbon)";
 
 export const BRANDS: Brand[] = [
   { name: "NOW Foods", logo: "/media/brands/now-foods.svg", ratio: 3.31 },
   { name: "Solgar", logo: "/media/brands/solgar.svg", ratio: 1.35 },
-  { name: "Optimum Nutrition", logo: "/media/brands/optimum-nutrition.svg", ratio: 3.56 },
+  { name: "Optimum Nutrition", logo: "/media/brands/optimum-nutrition.svg", ratio: 3.56, tint: LOGO_INK },
   { name: "Life Extension", logo: "/media/brands/life-extension.svg", ratio: 2.63 },
-  { name: "Pure Encapsulations", logo: "/media/brands/pure-encapsulations.svg", ratio: 3.33 },
+  { name: "Pure Encapsulations", logo: "/media/brands/pure-encapsulations.svg", ratio: 3.33, tint: LOGO_INK },
   { name: "Swanson", logo: "/media/brands/swanson.svg", ratio: 4.6 },
   { name: "BSN", logo: "/media/brands/bsn.svg", ratio: 1.81 },
-  { name: "Dymatize", logo: "/media/brands/dymatize.svg", ratio: 5.58 },
-  { name: "MyProtein", logo: "/media/brands/myprotein.svg", ratio: 7.87 },
+  { name: "Dymatize", logo: "/media/brands/dymatize.svg", ratio: 5.58, tint: LOGO_INK },
+  { name: "MyProtein", logo: "/media/brands/myprotein.svg", ratio: 7.87, tint: LOGO_INK },
   { name: "OstroVit", logo: "/media/brands/ostrovit.svg", ratio: 3.38 },
 ];
 

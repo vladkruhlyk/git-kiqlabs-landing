@@ -9,6 +9,8 @@ export type CountryCode = (typeof COUNTRY_CODES)[number];
 
 export type B2BCountry = {
   code: CountryCode;
+  /** Флаг-эмодзи для списков стран и кодов телефона. */
+  flag: string;
   /** Именительный: «Казахстан». */
   name: string;
   /** Винительный для «в …»: «в Казахстан». */
@@ -29,7 +31,7 @@ export type B2BCountry = {
 
 export const COUNTRIES: Record<CountryCode, B2BCountry> = {
   kz: {
-    code: "kz", name: "Казахстан", acc: "Казахстан", gen: "Казахстана",
+    code: "kz", flag: "🇰🇿", name: "Казахстан", acc: "Казахстан", gen: "Казахстана",
     dial: "+7", mask: "XXX XXX XX XX", tz: "Asia/Almaty",
     union: "ЕАЭС", marketplace: "Kaspi",
     dossier: [
@@ -40,7 +42,7 @@ export const COUNTRIES: Record<CountryCode, B2BCountry> = {
     ],
   },
   uz: {
-    code: "uz", name: "Узбекистан", acc: "Узбекистан", gen: "Узбекистана",
+    code: "uz", flag: "🇺🇿", name: "Узбекистан", acc: "Узбекистан", gen: "Узбекистана",
     dial: "+998", mask: "XX XXX XX XX", tz: "Asia/Tashkent",
     marketplace: "Uzum",
     dossier: [
@@ -51,11 +53,11 @@ export const COUNTRIES: Record<CountryCode, B2BCountry> = {
     ],
   },
   tj: {
-    code: "tj", name: "Таджикистан", acc: "Таджикистан", gen: "Таджикистана",
+    code: "tj", flag: "🇹🇯", name: "Таджикистан", acc: "Таджикистан", gen: "Таджикистана",
     dial: "+992", mask: "XX XXX XXXX", tz: "Asia/Dushanbe",
   },
   kg: {
-    code: "kg", name: "Кыргызстан", acc: "Кыргызстан", gen: "Кыргызстана",
+    code: "kg", flag: "🇰🇬", name: "Кыргызстан", acc: "Кыргызстан", gen: "Кыргызстана",
     dial: "+996", mask: "XXX XXX XXX", tz: "Asia/Bishkek",
     union: "ЕАЭС",
     dossier: [
@@ -65,15 +67,15 @@ export const COUNTRIES: Record<CountryCode, B2BCountry> = {
     ],
   },
   az: {
-    code: "az", name: "Азербайджан", acc: "Азербайджан", gen: "Азербайджана",
+    code: "az", flag: "🇦🇿", name: "Азербайджан", acc: "Азербайджан", gen: "Азербайджана",
     dial: "+994", mask: "XX XXX XX XX", tz: "Asia/Baku",
   },
   ge: {
-    code: "ge", name: "Грузия", acc: "Грузию", gen: "Грузии",
+    code: "ge", flag: "🇬🇪", name: "Грузия", acc: "Грузию", gen: "Грузии",
     dial: "+995", mask: "XXX XX XX XX", tz: "Asia/Tbilisi",
   },
   am: {
-    code: "am", name: "Армения", acc: "Армению", gen: "Армении",
+    code: "am", flag: "🇦🇲", name: "Армения", acc: "Армению", gen: "Армении",
     dial: "+374", mask: "XX XXX XXX", tz: "Asia/Yerevan",
     union: "ЕАЭС",
     dossier: [
@@ -83,11 +85,11 @@ export const COUNTRIES: Record<CountryCode, B2BCountry> = {
     ],
   },
   mn: {
-    code: "mn", name: "Монголия", acc: "Монголию", gen: "Монголии",
+    code: "mn", flag: "🇲🇳", name: "Монголия", acc: "Монголию", gen: "Монголии",
     dial: "+976", mask: "XXXX XXXX", tz: "Asia/Ulaanbaatar",
   },
   ae: {
-    code: "ae", name: "ОАЭ", acc: "ОАЭ", gen: "ОАЭ",
+    code: "ae", flag: "🇦🇪", name: "ОАЭ", acc: "ОАЭ", gen: "ОАЭ",
     dial: "+971", mask: "XX XXX XXXX", tz: "Asia/Dubai",
     marketplace: "Noon и Amazon",
   },
@@ -115,4 +117,33 @@ export function parseCountry(value: string | null | undefined): B2BCountry | und
 /** Сколько цифр в национальном номере по маске. */
 export function phoneLength(country: B2BCountry): number {
   return country.mask.replace(/[^X]/g, "").length;
+}
+
+/** Флаг для варианта «Другая страна». */
+export const OTHER_FLAG = "🌍";
+
+// Часовые пояса стран поставки (включая дополнительные зоны внутри страны).
+const TZ_TO_COUNTRY: Record<string, CountryCode> = {
+  "Asia/Almaty": "kz", "Asia/Qostanay": "kz", "Asia/Aqtobe": "kz", "Asia/Aqtau": "kz",
+  "Asia/Atyrau": "kz", "Asia/Oral": "kz", "Asia/Qyzylorda": "kz",
+  "Asia/Tashkent": "uz", "Asia/Samarkand": "uz",
+  "Asia/Dushanbe": "tj",
+  "Asia/Bishkek": "kg",
+  "Asia/Baku": "az",
+  "Asia/Tbilisi": "ge",
+  "Asia/Yerevan": "am",
+  "Asia/Ulaanbaatar": "mn", "Asia/Hovd": "mn", "Asia/Choibalsan": "mn",
+  "Asia/Dubai": "ae",
+};
+
+/**
+ * Страна посетителя по часовому поясу браузера (только на клиенте).
+ * Нужна, чтобы код телефона не был по умолчанию одной и той же страной.
+ */
+export function detectCountry(): CountryCode | undefined {
+  try {
+    return TZ_TO_COUNTRY[Intl.DateTimeFormat().resolvedOptions().timeZone];
+  } catch {
+    return undefined;
+  }
 }

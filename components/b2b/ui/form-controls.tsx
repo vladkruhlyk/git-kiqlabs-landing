@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import {
   COUNTRIES,
   COUNTRY_LIST,
+  OTHER_FLAG,
   phoneLength,
   type CountryCode,
 } from "@/lib/b2b/countries";
@@ -186,7 +187,7 @@ export function PhoneInput({
 
   return (
     <div className="flex gap-2">
-      <div className="relative w-[112px] shrink-0">
+      <div className="relative w-[128px] shrink-0">
         <select
           aria-label="Код страны"
           value={dial}
@@ -195,10 +196,10 @@ export function PhoneInput({
         >
           {COUNTRY_LIST.map((c) => (
             <option key={c.code} value={c.code}>
-              {c.code.toUpperCase()} {c.dial}
+              {c.flag} {c.dial}
             </option>
           ))}
-          <option value="other">Другой</option>
+          <option value="other">{OTHER_FLAG} Другой</option>
         </select>
         <ChevronDown
           aria-hidden

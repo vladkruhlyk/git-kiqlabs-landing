@@ -14,7 +14,7 @@ import {
   type DialChoice,
 } from "@/components/b2b/ui/form-controls";
 import { FACTS, GUIDE_BUSINESS_TYPES, PHONE } from "@/lib/b2b/constants";
-import type { CountryCode } from "@/lib/b2b/countries";
+import { detectCountry, type CountryCode } from "@/lib/b2b/countries";
 import { getAttribution, getMetaCookies } from "@/lib/b2b/attribution";
 import { submitLead } from "@/lib/lead";
 
@@ -38,11 +38,18 @@ export function GuideForm({
   const [company, setCompany] = useState("");
   const [businessType, setBusinessType] = useState("");
   const [email, setEmail] = useState("");
-  const [dial, setDial] = useState<DialChoice>(countryCode ?? "kz");
+  const [dial, setDial] = useState<DialChoice>(countryCode ?? "other");
   const [phone, setPhone] = useState("");
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
   const doneRef = useRef<HTMLDivElement>(null);
+
+  // Без ?country код телефона — по часовому поясу браузера, а не одна страна по умолчанию.
+  useEffect(() => {
+    if (countryCode) return;
+    const detected = detectCountry();
+    if (detected) setDial((d) => (d === "other" ? detected : d));
+  }, [countryCode]);
 
   useEffect(() => {
     if (status === "done") doneRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });

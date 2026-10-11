@@ -23,39 +23,52 @@ import {
   VOLUMES,
   keepAmounts,
 } from "@/lib/b2b/constants";
-import { COUNTRIES, COUNTRY_LIST, phoneLength, type CountryCode } from "@/lib/b2b/countries";
+import {
+  COUNTRIES,
+  COUNTRY_LIST,
+  OTHER_FLAG,
+  detectCountry,
+  phoneLength,
+  type CountryCode,
+} from "@/lib/b2b/countries";
 import { getAttribution, getMetaCookies } from "@/lib/b2b/attribution";
 import { submitLead } from "@/lib/lead";
 
-type FieldKey = "company" | "bin" | "businessType" | "country" | "volume" | "name" | "email" | "phone";
+type FieldKey = "company" | "businessType" | "country" | "volume" | "name" | "email" | "phone";
 type Errors = Partial<Record<FieldKey, string>>;
 
 // Порядок полей на экране — для фокуса на первой ошибке.
-const ORDER: FieldKey[] = ["company", "bin", "businessType", "country", "volume", "name", "email", "phone"];
+const ORDER: FieldKey[] = ["company", "businessType", "country", "volume", "name", "email", "phone"];
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 const BUSINESS_OPTIONS = BUSINESS_TYPES.map((t) => ({ value: t, label: t }));
 const COUNTRY_OPTIONS = [
-  ...COUNTRY_LIST.map((c) => ({ value: c.code, label: c.name })),
-  { value: "other", label: "Другая" },
+  ...COUNTRY_LIST.map((c) => ({ value: c.code, label: `${c.flag} ${c.name}` })),
+  { value: "other", label: `${OTHER_FLAG} Другая` },
 ];
 
 export function LeadForm() {
   const [company, setCompany] = useState("");
-  const [bin, setBin] = useState("");
   const [businessType, setBusinessType] = useState("");
   const [country, setCountry] = useState<"" | CountryCode | "other">("");
   const [volume, setVolume] = useState("");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [dial, setDial] = useState<DialChoice>("kz");
+  // Код телефона без привязки к одной стране: до определения — «Другой».
+  const [dial, setDial] = useState<DialChoice>("other");
   const [dialTouched, setDialTouched] = useState(false);
   const [phone, setPhone] = useState("");
   const [comment, setComment] = useState("");
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
   const doneRef = useRef<HTMLDivElement>(null);
+
+  // Страна посетителя по часовому поясу браузера — только для кода телефона.
+  useEffect(() => {
+    const detected = detectCountry();
+    if (detected) setDial((d) => (d === "other" ? detected : d));
+  }, []);
 
   useEffect(() => {
     if (status === "done") doneRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -80,7 +93,6 @@ export function LeadForm() {
   const validate = (): Errors => {
     const e: Errors = {};
     if (!company.trim()) e.company = "Укажите название компании";
-    if (bin.trim().length < 5) e.bin = "Укажите БИН, ИНН или регистрационный номер";
     if (!businessType) e.businessType = "Выберите тип бизнеса";
     if (!country) e.country = "Выберите страну поставки";
     if (!volume) e.volume = "Выберите объём закупки";
@@ -109,7 +121,6 @@ export function LeadForm() {
     const res = await submitLead({
       source: "b2b-landing",
       company: company.trim(),
-      bin: bin.trim(),
       role: businessType,
       volume,
       country: country === "other" ? "Другая" : COUNTRIES[country as CountryCode].name,
@@ -156,17 +167,6 @@ export function LeadForm() {
               }}
             />
           </Field>
-          <Field label="БИН / ИНН / регистрационный номер" htmlFor="lf-bin" error={errors.bin}>
-            <Input
-              id="lf-bin"
-              value={bin}
-              invalid={!!errors.bin}
-              onChange={(e) => {
-                setBin(e.target.value);
-                clear("bin");
-              }}
-            />
-          </Field>
           <Field label="Тип бизнеса" htmlFor="lf-businessType" error={errors.businessType}>
             <Select
               id="lf-businessType"
@@ -180,7 +180,12 @@ export function LeadForm() {
               }}
             />
           </Field>
-          <Field label="Страна поставки" htmlFor="lf-country" error={errors.country}>
+          <Field
+            label="Страна поставки"
+            htmlFor="lf-country"
+            error={errors.country}
+            className="sm:col-span-2"
+          >
             <Select
               id="lf-country"
               placeholder="Выберите"

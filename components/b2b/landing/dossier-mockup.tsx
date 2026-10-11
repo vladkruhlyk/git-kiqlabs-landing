@@ -20,7 +20,7 @@ export function DossierMockup() {
             <div className="text-[12px] font-medium leading-[1.5] text-[var(--color-slate-gray)]">
               Досье поставки
             </div>
-            <div className="truncate text-[16px] font-semibold leading-[1.4]">Казахстан · ЕАЭС</div>
+            <div className="truncate text-[16px] font-semibold leading-[1.4]">Под вашу страну</div>
           </div>
           <Badge>4 из 4 готово</Badge>
         </div>

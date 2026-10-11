@@ -34,7 +34,7 @@ export function PriceListMockup() {
               KIQ Labs Global · B2B
             </div>
             <div className="truncate text-[16px] font-semibold leading-[1.4]">
-              Прайс-лист · Казахстан · USD
+              Прайс-лист · Опт · USD
             </div>
           </div>
         </div>

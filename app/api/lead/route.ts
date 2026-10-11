@@ -1,5 +1,7 @@
 import { NextResponse, after } from "next/server";
 import { notify } from "@/lib/notify";
+import { sendCapiEvent } from "@/lib/meta-capi";
+import { isQualifiedLead } from "@/lib/b2b/qualify";
 
 export const runtime = "nodejs";
 // Заявки нельзя кэшировать / пре-рендерить.
@@ -11,6 +13,24 @@ const KEYCRM_URL =
   process.env.KEYCRM_API_URL ?? "https://openapi.keycrm.app/v1/pipelines/cards";
 
 const str = (v: unknown) => (typeof v === "string" ? v.trim() : "");
+
+const UTM_KEYS = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_content",
+  "utm_term",
+] as const;
+
+/** UTM-метки из тела заявки (объект utm), только известные ключи. */
+function utmOf(data: LeadBody): Record<(typeof UTM_KEYS)[number], string> {
+  const raw =
+    data.utm && typeof data.utm === "object" ? (data.utm as Record<string, unknown>) : {};
+  return Object.fromEntries(UTM_KEYS.map((k) => [k, str(raw[k])])) as Record<
+    (typeof UTM_KEYS)[number],
+    string
+  >;
+}
 
 export async function POST(req: Request) {
   let data: LeadBody;
@@ -32,16 +52,29 @@ export async function POST(req: Request) {
     );
   }
 
+  const source = str(data.source);
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    req.headers.get("x-real-ip") ??
+    "";
+  const userAgent = req.headers.get("user-agent") ?? "";
+
+  // Квалификация решается только на сервере (правило — lib/b2b/qualify.ts).
+  const qualifiedByRules = isQualifiedLead(source, {
+    volume: str(data.volume),
+    bin: str(data.bin),
+    tags: str(data.tags),
+    role: str(data.role),
+  });
+
   const card = buildKeyCrmData(data);
   const lead = {
     ...data,
+    qualified: qualifiedByRules,
     keycrm_data: card, // на случай, если webhook сам форвардит в KeyCRM
     submittedAt: new Date().toISOString(),
-    userAgent: req.headers.get("user-agent") ?? "",
-    ip:
-      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
-      req.headers.get("x-real-ip") ??
-      "",
+    userAgent,
+    ip,
   };
 
   // Бэкап: всегда пишем заявку в лог сервера.
@@ -50,7 +83,7 @@ export async function POST(req: Request) {
   // Уведомление о конверсии (Telegram / Sheets / webhook) — после ответа,
   // не блокируя и не ломая сабмит. Срабатывает всегда, даже если CRM/вебхук
   // не настроены.
-  after(() => notifyNewLead(data));
+  after(() => notifyNewLead(data, qualifiedByRules));
 
   // Шлём во все настроенные получатели параллельно.
   const tasks: { name: string; run: () => Promise<boolean> }[] = [];
@@ -61,20 +94,46 @@ export async function POST(req: Request) {
     tasks.push({ name: "keycrm", run: () => sendToKeyCrm(card) });
   }
 
+  const delivered: Record<string, boolean> = {};
+  let anyOk = true;
   if (tasks.length === 0) {
     console.warn("[lead] нет настроенных получателей (webhook/KeyCRM).");
-    return NextResponse.json({ ok: true, delivered: {} });
+  } else {
+    const settled = await Promise.allSettled(tasks.map((t) => t.run()));
+    settled.forEach((r, i) => {
+      delivered[tasks[i].name] = r.status === "fulfilled" && r.value === true;
+    });
+    anyOk = Object.values(delivered).some(Boolean);
   }
 
-  const settled = await Promise.allSettled(tasks.map((t) => t.run()));
-  const delivered: Record<string, boolean> = {};
-  settled.forEach((r, i) => {
-    delivered[tasks[i].name] = r.status === "fulfilled" && r.value === true;
-  });
+  // QualifiedLead считаем только по реально принятой заявке — так же, как
+  // браузер шлёт пиксель только при успешном ответе.
+  const qualified = anyOk && qualifiedByRules;
+  const eventId = str(data.eventId);
+  if (qualified && eventId) {
+    after(() =>
+      sendCapiEvent({
+        eventName: "QualifiedLead",
+        eventId,
+        eventSourceUrl: str(data.page) || undefined,
+        email: str(data.email),
+        phone: str(data.phone),
+        countryCode: str(data.countryCode),
+        ip,
+        userAgent,
+        fbp: str(data.fbp) || undefined,
+        fbc: str(data.fbc) || undefined,
+        customData: {
+          content_name: source,
+          ...(str(data.volume) ? { volume: str(data.volume) } : {}),
+          ...(str(data.role) ? { business_type: str(data.role) } : {}),
+        },
+      }),
+    );
+  }
 
-  const anyOk = Object.values(delivered).some(Boolean);
   return NextResponse.json(
-    { ok: anyOk, delivered },
+    { ok: anyOk, delivered, qualified },
     { status: anyOk ? 200 : 502 },
   );
 }
@@ -84,6 +143,9 @@ function sourceLabel(source: unknown): string {
   const s = str(source);
   if (s === "quiz") return "Квиз";
   if (s === "b2b") return "B2B-лендинг";
+  if (s === "b2b-landing") return "B2B-лендинг";
+  if (s === "b2b-quiz") return "B2B-квиз";
+  if (s === "b2b-guide") return "B2B-гайд";
   if (s === "contact") return "Форма контактов";
   if (s.startsWith("region-")) {
     return `Гео-лендинг (${s.replace("region-", "").toUpperCase()})`;
@@ -92,7 +154,9 @@ function sourceLabel(source: unknown): string {
 }
 
 /** Рассылает уведомление о новой заявке (Telegram / Sheets / webhook). */
-function notifyNewLead(data: LeadBody): Promise<void> {
+function notifyNewLead(data: LeadBody, qualified: boolean): Promise<void> {
+  const source = str(data.source);
+  const utm = utmOf(data);
   return notify(
     "🆕 Новая заявка с сайта",
     {
@@ -107,10 +171,21 @@ function notifyNewLead(data: LeadBody): Promise<void> {
       Объём: str(data.volume),
       "Тип запроса": str(data.inquiry),
       Сообщение: str(data.message),
+      // Новые поля — строго В КОНЦЕ: колонки таблицы идут в порядке ключей,
+      // так старые столбцы не сдвигаются.
+      "БИН/ИНН": str(data.bin),
+      Теги: str(data.tags),
+      "Слот звонка": str(data.slot),
+      Квалифицирован: source.startsWith("b2b-") ? (qualified ? "Да" : "Нет") : "",
+      utm_source: utm.utm_source,
+      utm_medium: utm.utm_medium,
+      utm_campaign: utm.utm_campaign,
+      utm_content: utm.utm_content,
+      utm_term: utm.utm_term,
     },
     {
       // Дедуп: повторный POST с теми же контактами не задублирует уведомление.
-      eventId: `lead:${str(data.source)}:${str(data.email)}:${str(data.phone)}:${str(data.name)}`,
+      eventId: `lead:${source}:${str(data.email)}:${str(data.phone)}:${str(data.name)}`,
     },
   );
 }
@@ -168,11 +243,20 @@ function buildKeyCrmData(data: LeadBody) {
     `Компания: ${company || "-"}`,
     `Telegram/Телефон: ${phone || "-"}`,
   ];
+  if (str(data.bin)) comment.push(`БИН/ИНН: ${str(data.bin)}`);
   if (str(data.role)) comment.push(`Тип бизнеса: ${str(data.role)}`);
   if (str(data.categories)) comment.push(`Категории: ${str(data.categories)}`);
   if (str(data.volume)) comment.push(`Объём: ${str(data.volume)}`);
   if (str(data.country)) comment.push(`Страна: ${str(data.country)}`);
   if (str(data.inquiry)) comment.push(`Тип запроса: ${str(data.inquiry)}`);
+  if (str(data.slot)) comment.push(`Слот звонка: ${str(data.slot)}`);
+  if (str(data.tags)) comment.push(`Теги: ${str(data.tags)}`);
+  if (str(data.source)) comment.push(`Источник: ${sourceLabel(data.source)}`);
+  const utm = Object.entries(utmOf(data))
+    .filter(([, v]) => v)
+    .map(([k, v]) => `${k}=${v}`)
+    .join(", ");
+  if (utm) comment.push(`UTM: ${utm}`);
   comment.push(`Комментарий: ${str(data.message) || "-"}`);
 
   const card: Record<string, unknown> = {

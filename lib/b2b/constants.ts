@@ -46,8 +46,8 @@ export const GUIDE_BUSINESS_TYPES = [
 export type Brand = { name: string; logo?: string; ratio?: number };
 
 export const BRANDS: Brand[] = [
-  { name: "NOW Foods" },
-  { name: "Solgar" },
+  { name: "NOW Foods", logo: "/media/brands/now-foods.svg", ratio: 3.31 },
+  { name: "Solgar", logo: "/media/brands/solgar.svg", ratio: 1.35 },
   { name: "Optimum Nutrition", logo: "/media/brands/optimum-nutrition.svg", ratio: 3.56 },
   { name: "Life Extension", logo: "/media/brands/life-extension.svg", ratio: 2.63 },
   { name: "Pure Encapsulations", logo: "/media/brands/pure-encapsulations.svg", ratio: 3.33 },

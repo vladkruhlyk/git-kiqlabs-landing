@@ -152,6 +152,16 @@
   }
 }
 
+@keyframes b2b-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
 @layer components {
   /* Заголовки: на мобиле — нижняя граница системы (38px), на десктопе 50px.
      Hero выше 50px не поднимаем: длинные русские слова в половине ширины
@@ -195,6 +205,20 @@
     .b2b .b2b-screen-in {
       animation: none;
     }
+  }
+
+  /* «Плавание» банок: медленно и на 10px, без JS. */
+  .b2b .b2b-float {
+    animation: b2b-float 6s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .b2b .b2b-float {
+      animation: none;
+    }
+  }
+  /* Тень банок — на голубоватой базе, как вся elevation системы. */
+  .b2b .b2b-bottle-shadow {
+    filter: drop-shadow(0 18px 22px rgba(71, 103, 136, 0.28));
   }
 
   /* Elevation из DESIGN.md */

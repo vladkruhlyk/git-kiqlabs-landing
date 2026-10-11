@@ -13,6 +13,7 @@ import {
   TopStrip,
 } from "@/components/b2b/ui/chrome";
 import { StickyBar } from "@/components/b2b/ui/sticky-bar";
+import { BottleGroup } from "@/components/b2b/ui/bottles";
 import { EMAIL, FACTS } from "@/lib/b2b/constants";
 import { PriceListMockup } from "./price-list-mockup";
 import { DossierMockup } from "./dossier-mockup";
@@ -55,7 +56,7 @@ const STEPS = [
 ];
 
 const FAQ = [
-  { q: "Какой минимальный заказ?", a: "От $5 000 за заказ." },
+  { q: "Какой минимальный заказ?", a: "От $5 000 за заказ." },
   { q: "В какой валюте оплата?", a: "USD, а также KZT и UZS по договорённости." },
   { q: "Есть ли документы для моего рынка?", a: "Да, готовим досье под каждую страну из списка." },
   { q: "Какие сроки?", a: "14–28 дней с момента оплаты." },
@@ -64,7 +65,7 @@ const FAQ = [
 export function B2BLanding() {
   return (
     <>
-      <TopStrip>Только B2B · Минимальный заказ от $5 000 · Розница не обслуживается</TopStrip>
+      <TopStrip>Только B2B · Минимальный заказ от $5 000 · Розница не обслуживается</TopStrip>
       <Header right={<PhoneLink />} />
 
       <main>
@@ -94,7 +95,14 @@ export function B2BLanding() {
                 </li>
               </ul>
             </div>
-            <PriceListMockup />
+            {/* Коллаж: прайс-лист и банки поверх его нижнего правого угла. */}
+            <div className="relative pb-24 sm:pb-12 lg:pb-14">
+              <PriceListMockup />
+              <BottleGroup
+                eager
+                className="absolute bottom-0 right-1 w-[54%] sm:-bottom-2 sm:right-0 sm:w-[44%] lg:-right-6 lg:w-[48%]"
+              />
+            </div>
           </Container>
         </section>
 

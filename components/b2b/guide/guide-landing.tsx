@@ -92,7 +92,7 @@ export function GuideLanding({ country }: { country?: B2BCountry }) {
             <h2 className="b2b-h2">Для кого</h2>
             <p className="mt-5 text-[20px] leading-[1.4]">
               Для компаний, которые уже импортируют или планируют закупать витамины и БАДы
-              оптом от $5 000.
+              оптом от $5 000.
             </p>
             <p className="mt-4 text-[14px] leading-[1.4] text-[var(--color-slate-gray)]">
               Гайд не предназначен для частных покупателей.

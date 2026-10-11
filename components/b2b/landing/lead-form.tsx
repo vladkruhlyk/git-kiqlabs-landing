@@ -21,6 +21,7 @@ import {
   PHONE,
   TAG_LOW_VOLUME,
   VOLUMES,
+  keepAmounts,
 } from "@/lib/b2b/constants";
 import { COUNTRIES, COUNTRY_LIST, phoneLength, type CountryCode } from "@/lib/b2b/countries";
 import { getAttribution, getMetaCookies } from "@/lib/b2b/attribution";
@@ -209,13 +210,13 @@ export function LeadForm() {
                   clear("volume");
                 }}
               >
-                {v}
+                {keepAmounts(v)}
               </OptionCard>
             ))}
           </div>
           {volume === LOW_VOLUME && (
             <InfoNote className="mt-3">
-              Минимальный заказ — $5 000. Можно собрать из разных брендов и категорий.
+              Минимальный заказ — $5 000. Можно собрать из разных брендов и категорий.
               Отправьте заявку — менеджер подскажет.
             </InfoNote>
           )}

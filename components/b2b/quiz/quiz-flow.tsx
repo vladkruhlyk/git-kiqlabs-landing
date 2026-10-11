@@ -5,6 +5,7 @@ import { ArrowLeft, Check, CircleCheck } from "lucide-react";
 import { Button } from "@/components/b2b/ui/button";
 import { Badge, Card } from "@/components/b2b/ui/card";
 import { BlobbedVisual } from "@/components/b2b/ui/blob";
+import { BottleGroup } from "@/components/b2b/ui/bottles";
 import { Container, Header } from "@/components/b2b/ui/chrome";
 import { LogoStrip } from "@/components/b2b/ui/logo-strip";
 import { OptionCard } from "@/components/b2b/ui/option-card";
@@ -25,6 +26,7 @@ import {
   QUIZ_ROLES,
   TAG_LOW_VOLUME,
   VOLUMES,
+  keepAmounts,
 } from "@/lib/b2b/constants";
 import {
   COUNTRIES,
@@ -205,7 +207,7 @@ export function QuizFlow({ presetCountry }: { presetCountry?: CountryCode }) {
                     <>
                       <h2 className={Q_TITLE}>Спасибо за интерес!</h2>
                       <p className="mt-4 text-[16px] leading-[1.5] text-[var(--color-slate-gray)]">
-                        KIQ Labs работает только с компаниями — оптовыми закупщиками от $5 000.
+                        KIQ Labs работает только с компаниями — оптовыми закупщиками от $5 000.
                       </p>
                       {RETAIL_PARTNERS.length > 0 && (
                         <>
@@ -346,7 +348,7 @@ export function QuizFlow({ presetCountry }: { presetCountry?: CountryCode }) {
                       <div role="group" aria-label="Объём закупки" className="mt-6 grid gap-3">
                         {VOLUMES.map((v) => (
                           <OptionCard key={v} selected={volume === v} onClick={() => pickVolume(v)}>
-                            {v}
+                            {keepAmounts(v)}
                           </OptionCard>
                         ))}
                       </div>
@@ -355,7 +357,7 @@ export function QuizFlow({ presetCountry }: { presetCountry?: CountryCode }) {
 
                   {screen === "lowVolume" && (
                     <>
-                      <h2 className={Q_TITLE}>Минимальный заказ — $5 000</h2>
+                      <h2 className={Q_TITLE}>Минимальный заказ — $5 000</h2>
                       <p className="mt-4 text-[18px] leading-[1.5] text-[var(--color-slate-gray)]">
                         Его можно собрать из разных брендов и категорий — менеджер поможет.
                       </p>
@@ -412,13 +414,19 @@ function StartScreen({
             Узнайте закупочную цену на витамины и спортпит из США и ЕС для вашего бизнеса
           </h1>
           <p className="b2b-lead mt-5 max-w-[560px]">
-            Только для юридических лиц. Минимальный заказ от $5 000
+            Только для юридических лиц. Минимальный заказ от $5 000
           </p>
           <Button size="lg" className="mt-8 w-full sm:w-auto" onClick={onStart}>
             Начать расчёт
           </Button>
         </div>
-        <ResultPreview countryName={countryName} />
+        <div className="relative pb-12 lg:pb-14">
+          <ResultPreview countryName={countryName} />
+          <BottleGroup
+            eager
+            className="absolute -bottom-2 right-0 w-[54%] sm:w-[42%] lg:-right-6 lg:w-[46%]"
+          />
+        </div>
       </Container>
       <Container className="mt-14 lg:mt-20">
         <LogoStrip caption={`${FACTS.brands} брендов с прямыми контрактами`} />

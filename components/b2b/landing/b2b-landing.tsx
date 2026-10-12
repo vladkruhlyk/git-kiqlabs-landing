@@ -17,7 +17,6 @@ import { BottleGroup, ProductShelf } from "@/components/b2b/ui/bottles";
 import { Blob } from "@/components/b2b/ui/blob";
 import { EMAIL, FACTS } from "@/lib/b2b/constants";
 import { PriceListMockup } from "./price-list-mockup";
-import { DossierMockup } from "./dossier-mockup";
 import { OfficesCard } from "./offices-card";
 import { Comparison } from "./comparison";
 import { LeadForm } from "./lead-form";
@@ -40,13 +39,6 @@ const AUDIENCE = [
     body: "Документы и штрихкоды для карточек товара",
   },
   { icon: Tags, title: "Private Label", body: "Производство под вашим брендом на фабриках США и ЕС" },
-];
-
-const DOCS = [
-  "Сертификаты анализа (CoA)",
-  "Регистрационное досье",
-  "Декларации ЕАЭС",
-  "Таможенное сопровождение",
 ];
 
 const STEPS = [
@@ -179,36 +171,6 @@ export function B2BLanding() {
             <ButtonLink href="#form" size="lg" className="w-full sm:w-auto">
               {CTA}
             </ButtonLink>
-          </div>
-        </Section>
-
-        {/* ─── Документы ─── */}
-        <Section>
-          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
-            <div className="lg:order-2">
-              <h2 className="b2b-h2 text-balance">Документы под ваш рынок</h2>
-              <p className="mt-4 max-w-[520px] text-[16px] leading-[1.5] text-[var(--color-slate-gray)]">
-                Готовим досье под требования каждой страны из списка поставок.
-              </p>
-              <ul className="mt-6 space-y-3">
-                {DOCS.map((d) => (
-                  <li key={d} className="flex items-center gap-3 text-[18px] font-medium leading-[1.4]">
-                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-[var(--color-badge-fill)] text-[var(--color-signal-blue)]">
-                      <Check aria-hidden className="size-3.5" strokeWidth={3} />
-                    </span>
-                    {d}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="relative pb-16 lg:order-1 lg:pb-24">
-              <DossierMockup />
-              {/* Банки перед нижними (размытыми) строками досье. */}
-              <BottleGroup
-                ids={["magnesium-glycinate", "vitamin-d3"]}
-                className="absolute bottom-0 right-2 w-[44%] sm:w-[34%] lg:-right-8 lg:w-[34%]"
-              />
-            </div>
           </div>
         </Section>
 

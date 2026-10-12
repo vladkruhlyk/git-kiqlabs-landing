@@ -24,7 +24,6 @@ export const BUSINESS_TYPES = [
   "Дистрибьютор",
   "Аптечная сеть",
   "Интернет-магазин или маркетплейс",
-  "Private Label",
   "Другое B2B",
 ] as const;
 
@@ -34,7 +33,6 @@ export const GUIDE_BUSINESS_TYPES = [
   "Дистрибьютор",
   "Аптечная сеть",
   "Интернет-магазин или маркетплейс",
-  "Private Label",
   PLANNING_LAUNCH,
 ] as const;
 
@@ -89,7 +87,6 @@ export const QUIZ_ROLES = [
   "Дистрибьютор",
   "Аптечная сеть",
   "Интернет-магазин или селлер маркетплейса",
-  "Private Label",
   QUIZ_RETAIL,
 ] as const;
 
@@ -98,7 +95,6 @@ export const QUIZ_CATEGORIES = [
   { label: "Спортивное питание", dative: "спортивному питанию", short: "спортпиту" },
   { label: "Витамины и минералы", dative: "витаминам и минералам", short: "витаминам" },
   { label: "Клинические БАДы", dative: "клиническим БАДам", short: "клиническим БАДам" },
-  { label: "Private Label", dative: "Private Label", short: "Private Label" },
 ] as const;
 
 /** Для вывода: неразрывный пробел внутри сумм («$5 000» не рвётся на две строки). */

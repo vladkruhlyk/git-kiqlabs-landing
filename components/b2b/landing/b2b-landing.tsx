@@ -1,4 +1,4 @@
-import { Check, Mail, Pill, ShoppingCart, Tags, Truck, X } from "lucide-react";
+import { Check, Mail, Pill, ShoppingCart, Truck, X } from "lucide-react";
 import { ButtonLink } from "@/components/b2b/ui/button";
 import { Badge, Card } from "@/components/b2b/ui/card";
 import { Accordion } from "@/components/b2b/ui/accordion";
@@ -27,7 +27,7 @@ const STATS = [
   { value: FACTS.discount, label: "к закупке через трейдеров" },
   { value: FACTS.shipping, label: "отгрузка" },
   { value: FACTS.countries, label: "поставок" },
-  { value: `от ${FACTS.minOrder}`, label: "минимальный заказ" },
+  { value: `от ${FACTS.minOrder}`, label: "минимальный заказ на бренд" },
 ];
 
 const AUDIENCE = [
@@ -38,7 +38,6 @@ const AUDIENCE = [
     title: "Интернет-магазины и селлеры маркетплейсов",
     body: "Документы и штрихкоды для карточек товара",
   },
-  { icon: Tags, title: "Private Label", body: "Производство под вашим брендом на фабриках США и ЕС" },
 ];
 
 const STEPS = [
@@ -49,7 +48,7 @@ const STEPS = [
 ];
 
 const FAQ = [
-  { q: "Какой минимальный заказ?", a: "От $5 000 за заказ." },
+  { q: "Какой минимальный заказ?", a: "От $5 000 на один бренд." },
   { q: "В какой валюте оплата?", a: "USD, а также KZT и UZS по договорённости." },
   { q: "Какие сроки?", a: "14–28 дней с момента оплаты." },
 ];
@@ -138,7 +137,7 @@ export function B2BLanding() {
         {/* ─── Для кого ─── */}
         <Section>
           <SectionHeader title="Для кого работаем" />
-          <ul className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="mt-10 grid gap-4 md:grid-cols-3">
             {AUDIENCE.map((a) => {
               const Icon = a.icon;
               return (

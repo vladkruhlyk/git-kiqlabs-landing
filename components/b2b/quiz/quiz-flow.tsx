@@ -356,9 +356,9 @@ export function QuizFlow({ presetCountry }: { presetCountry?: CountryCode }) {
 
                   {screen === "lowVolume" && (
                     <>
-                      <h2 className={Q_TITLE}>Минимальный заказ — $5 000</h2>
+                      <h2 className={Q_TITLE}>Минимальный заказ — $5 000 на бренд</h2>
                       <p className="mt-4 text-[18px] leading-[1.5] text-[var(--color-slate-gray)]">
-                        Его можно собрать из разных брендов и категорий — менеджер поможет.
+                        Менеджер поможет подобрать позиции под этот объём.
                       </p>
                       <Button size="lg" full className="mt-8" onClick={() => go("final")}>
                         Продолжить

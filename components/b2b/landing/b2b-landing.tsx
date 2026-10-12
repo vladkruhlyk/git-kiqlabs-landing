@@ -116,16 +116,14 @@ export function B2BLanding() {
             <Blob color="magenta" className="right-[10%] top-2 size-36 lg:size-52" />
             <ProductShelf
               ids={[
-                "creatine",
                 "vitamin-d3",
                 "omega-3",
                 "triple-zinc",
                 "marine-collagen",
                 "magnesium-glycinate",
                 "biotin-plus",
-                "wpc80",
               ]}
-              mobile={["creatine", "vitamin-d3", "triple-zinc", "marine-collagen"]}
+              mobile={["vitamin-d3", "triple-zinc", "marine-collagen", "magnesium-glycinate"]}
             />
           </div>
         </Section>
@@ -251,11 +249,10 @@ export function B2BLanding() {
             </div>
             <div className="relative">
               <OfficesCard />
-              {/* Пакеты и банка — в правой (пустой) части строк, над подвалом карточки. */}
+              {/* Флакон и банка — в правой (пустой) части строк, над подвалом карточки. */}
               <BottleGroup
-                ids={["creatine", "wpc80", "marine-collagen"]}
-                sizes={["z-10 w-[36%] -mr-[8%]", "z-20 w-[40%]", "z-10 w-[34%] -ml-[8%]"]}
-                className="absolute bottom-[64px] right-1 w-[50%] sm:w-[44%] lg:-right-10 lg:w-[50%]"
+                ids={["triple-zinc", "marine-collagen"]}
+                className="absolute bottom-[64px] right-1 w-[44%] sm:w-[40%] lg:-right-10 lg:w-[44%]"
               />
             </div>
           </div>

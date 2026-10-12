@@ -64,8 +64,8 @@ export const BRANDS: Brand[] = [
 
 /**
  * Фото банок (WebP с прозрачностью, public/media/bottles) — с официальных сайтов
- * брендов. scale — относительная высота на «полке» (пакеты выше флаконов, банка
- * коллагена ниже), чтобы ряд выглядел как настоящая полка.
+ * брендов. scale — относительная высота на «полке» (банка коллагена ниже
+ * флаконов), чтобы ряд выглядел как настоящая полка.
  */
 export const BOTTLE_IMAGES = {
   "omega-3": { src: "/media/bottles/ostrovit-omega-3.webp", alt: "OstroVit Omega 3", w: 334, h: 640, scale: 0.95 },
@@ -73,8 +73,6 @@ export const BOTTLE_IMAGES = {
   "biotin-plus": { src: "/media/bottles/ostrovit-biotin-plus.webp", alt: "OstroVit Biotin Plus", w: 216, h: 416, scale: 0.85 },
   "vitamin-d3": { src: "/media/bottles/ostrovit-vitamin-d3.webp", alt: "OstroVit Vitamin D3 2000 IU", w: 212, h: 406, scale: 0.9 },
   "magnesium-glycinate": { src: "/media/bottles/ostrovit-magnesium-glycinate.webp", alt: "OstroVit Magnesium Glycinate", w: 216, h: 413, scale: 0.95 },
-  creatine: { src: "/media/bottles/ostrovit-creatine.webp", alt: "OstroVit Creatine Monohydrate 500 g", w: 322, h: 419, scale: 1.15 },
-  wpc80: { src: "/media/bottles/ostrovit-wpc80.webp", alt: "OstroVit WPC 80", w: 279, h: 414, scale: 1.2 },
   "marine-collagen": { src: "/media/bottles/ostrovit-marine-collagen.webp", alt: "OstroVit Marine Collagen 200 g", w: 386, h: 405, scale: 0.8 },
 } as const;
 

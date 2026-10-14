@@ -144,6 +144,7 @@ function sourceLabel(source: unknown): string {
   if (s === "b2b") return "B2B-лендинг";
   if (s === "b2b-landing") return "B2B-лендинг";
   if (s === "b2b-quiz") return "B2B-квиз";
+  if (s === "b2b-call") return "B2B-квиз со звонком";
   if (s === "b2b-guide") return "B2B-гайд";
   if (s === "contact") return "Форма контактов";
   if (s.startsWith("region-")) {

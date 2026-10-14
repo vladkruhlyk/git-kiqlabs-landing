@@ -26,7 +26,7 @@ export type LeadPayload = {
   bin?: string;
   /** Теги через запятую, например "low_volume". */
   tags?: string;
-  /** Выбранный слот звонка (B2B-квиз). */
+  /** Выбранный слот звонка (квиз со звонком /b2b/call). */
   slot?: string;
   /** UTM-метки и fbclid визита. */
   utm?: Record<string, string>;

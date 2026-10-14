@@ -37,10 +37,12 @@ import {
   type CountryCode,
 } from "@/lib/b2b/countries";
 import { RETAIL_PARTNERS } from "@/lib/b2b/partners";
+import { utcLabel } from "@/lib/b2b/slots";
 import { getAttribution, getMetaCookies } from "@/lib/b2b/attribution";
 import { trackCustom } from "@/lib/fbpixel";
 import { submitLead } from "@/lib/lead";
 import { cn } from "@/lib/utils";
+import { BookingWidget, type PickedSlot } from "./booking-widget";
 import { ResultPreview } from "./result-preview";
 
 type Screen =
@@ -61,7 +63,17 @@ type CountryChoice = CountryCode | "other" | "";
 const AUTO_ADVANCE_MS = 250;
 const Q_TITLE = "text-[38px] font-bold leading-[1.21] text-balance";
 
-export function QuizFlow({ presetCountry }: { presetCountry?: CountryCode }) {
+/**
+ * B2B-квиз. booking — вариант для /b2b/call: в финале клиент сам выбирает
+ * день и время звонка, заявка уходит с источником b2b-call.
+ */
+export function QuizFlow({
+  presetCountry,
+  booking = false,
+}: {
+  presetCountry?: CountryCode;
+  booking?: boolean;
+}) {
   const [history, setHistory] = useState<Screen[]>(["start"]);
   const screen = history[history.length - 1];
 
@@ -69,6 +81,7 @@ export function QuizFlow({ presetCountry }: { presetCountry?: CountryCode }) {
   const [country, setCountry] = useState<CountryChoice>(presetCountry ?? "");
   const [categories, setCategories] = useState<string[]>([]);
   const [volume, setVolume] = useState("");
+  const [booked, setBooked] = useState("");
 
   const fired = useRef({ start: false, retail: false });
   const timer = useRef<number | undefined>(undefined);
@@ -146,6 +159,7 @@ export function QuizFlow({ presetCountry }: { presetCountry?: CountryCode }) {
         {screen === "start" ? (
           <StartScreen
             total={total}
+            booking={booking}
             countryName={presetCountry ? c?.name : undefined}
             onStart={() => go("who")}
           />
@@ -368,20 +382,22 @@ export function QuizFlow({ presetCountry }: { presetCountry?: CountryCode }) {
 
                   {screen === "final" && (
                     <FinalStep
+                      booking={booking}
                       role={role}
                       country={country}
                       categories={categories}
                       volume={volume}
                       title={`Покажем персональный прайс и маржу по ${categoryPhrase} ${countryPhrase}`}
-                      onDone={() => {
-                        // После брони «Назад» не нужен: история начинается с подтверждения.
+                      onDone={(slotText) => {
+                        setBooked(slotText);
+                        // После отправки «Назад» не нужен: история начинается с подтверждения.
                         setHistory(["done"]);
                         window.scrollTo({ top: 0, behavior: "instant" });
                       }}
                     />
                   )}
 
-                  {screen === "done" && <DoneScreen />}
+                  {screen === "done" && <DoneScreen slotText={booked} />}
                 </div>
               </Card>
             </BlobbedVisual>
@@ -396,10 +412,12 @@ export function QuizFlow({ presetCountry }: { presetCountry?: CountryCode }) {
 
 function StartScreen({
   total,
+  booking,
   countryName,
   onStart,
 }: {
   total: number;
+  booking: boolean;
   countryName?: string;
   onStart: () => void;
 }) {
@@ -412,7 +430,9 @@ function StartScreen({
             Узнайте закупочную цену на витамины и спортпит из США и ЕС для вашего бизнеса
           </h1>
           <p className="b2b-lead mt-5 max-w-[560px]">
-            Только для юридических лиц. Минимальный заказ от $5 000
+            {booking
+              ? `Ответьте на ${total} вопроса и выберите удобное время звонка с менеджером. Только для юридических лиц, минимальный заказ от $5 000`
+              : "Только для юридических лиц. Минимальный заказ от $5 000"}
           </p>
           <Button size="lg" className="mt-8 w-full sm:w-auto" onClick={onStart}>
             Начать расчёт
@@ -434,13 +454,14 @@ function StartScreen({
   );
 }
 
-/* ─────────── Финал: бронь звонка ─────────── */
+/* ─────────── Финал: контакты (и бронь звонка на /b2b/call) ─────────── */
 
-type FinalErrors = Partial<Record<"company" | "name" | "email" | "phone", string>>;
-const FINAL_ORDER = ["company", "name", "email", "phone"] as const;
+type FinalErrors = Partial<Record<"slot" | "company" | "name" | "email" | "phone", string>>;
+const FINAL_ORDER = ["slot", "company", "name", "email", "phone"] as const;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 function FinalStep({
+  booking,
   role,
   country,
   categories,
@@ -453,10 +474,14 @@ function FinalStep({
   categories: string[];
   volume: string;
   title: string;
-  onDone: () => void;
+  booking: boolean;
+  onDone: (slotText: string) => void;
 }) {
   const c = country && country !== "other" ? COUNTRIES[country] : undefined;
+  // Слоты — по времени страны поставки, иначе по поясу браузера.
+  const tz = c?.tz ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
 
+  const [picked, setPicked] = useState<PickedSlot | null>(null);
   const [company, setCompany] = useState("");
   const [name, setName] = useState("");
   // Код телефона: страна из ответа квиза, иначе — по часовому поясу браузера.
@@ -468,10 +493,18 @@ function FinalStep({
 
   const clear = (k: keyof FinalErrors) => setErrors((e) => (e[k] ? { ...e, [k]: undefined } : e));
 
+  // «ср, 15 окт. · 11:30 (время Казахстана, UTC+5) · 06:30 UTC» — менеджер сверит со своим временем.
+  const slotText = picked
+    ? `${picked.day.weekday}, ${picked.day.label} · ${picked.slot.time} (${
+        c ? `время ${c.gen}` : "время клиента"
+      }, ${utcLabel(tz)}) · ${picked.slot.utc}`
+    : "";
+
   const onSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     if (status === "sending") return;
     const e: FinalErrors = {};
+    if (booking && !picked) e.slot = "Выберите удобное время звонка";
     if (!company.trim()) e.company = "Укажите название компании";
     if (name.trim().length < 2) e.name = "Укажите имя";
     if (!isPhoneValid(dial, phone)) e.phone = "Проверьте номер телефона";
@@ -491,13 +524,14 @@ function FinalStep({
     ) as Record<string, string>;
     const { fbp, fbc } = getMetaCookies();
     const res = await submitLead({
-      source: "b2b-quiz",
+      source: booking ? "b2b-call" : "b2b-quiz",
       role,
       categories: categories.join(", "),
       volume,
       country: c?.name ?? (country === "other" ? "Другая" : ""),
       countryCode: c?.code ?? "",
       tags: volume === LOW_VOLUME ? TAG_LOW_VOLUME : "",
+      slot: slotText,
       company: company.trim(),
       name: name.trim(),
       phone: fullPhone(dial, phone),
@@ -507,7 +541,7 @@ function FinalStep({
       fbc,
       locale: "ru",
     });
-    if (res.ok) onDone();
+    if (res.ok) onDone(slotText);
     else setStatus("error");
   };
 
@@ -516,9 +550,30 @@ function FinalStep({
       <Badge size="md">Расчёт готов</Badge>
       <h2 className="mt-4 text-[28px] font-bold leading-[1.21] text-balance sm:text-[38px]">{title}</h2>
       <p className="mt-3 text-[16px] leading-[1.5] text-[var(--color-slate-gray)]">
-        15-минутный звонок с менеджером вашего региона
+        {booking
+          ? "Выберите время 15-минутного звонка с менеджером вашего региона"
+          : "15-минутный звонок с менеджером вашего региона"}
       </p>
 
+      {booking && (
+        <div id="qf-slot" tabIndex={-1} className="mt-6 outline-none">
+          <BookingWidget
+            tz={tz}
+            regionLabel={c?.name}
+            value={picked}
+            invalid={!!errors.slot}
+            onChange={(v) => {
+              setPicked(v);
+              clear("slot");
+            }}
+          />
+          {errors.slot && (
+            <p role="alert" className="mt-1.5 text-[12px] leading-[1.5] text-[var(--color-error)]">
+              {errors.slot}
+            </p>
+          )}
+        </div>
+      )}
 
       <div className="mt-6 grid gap-5 sm:grid-cols-2">
         <Field label="Компания" htmlFor="qf-company" error={errors.company}>
@@ -585,7 +640,7 @@ function FinalStep({
       )}
 
       <Button type="submit" size="lg" full className="mt-6" disabled={status === "sending"}>
-        {status === "sending" ? "Отправляем…" : "Получить расчёт"}
+        {status === "sending" ? "Отправляем…" : booking ? "Забронировать звонок" : "Получить расчёт"}
       </Button>
       <p className="mt-3 text-center text-[14px] leading-[1.4] text-[var(--color-slate-gray)]">
         Только для юрлиц. Звонок проводит менеджер по вашему региону
@@ -596,14 +651,27 @@ function FinalStep({
 
 /* ─────────── Подтверждение ─────────── */
 
-function DoneScreen() {
+function DoneScreen({ slotText }: { slotText: string }) {
   return (
     <div className="text-center">
       <CircleCheck aria-hidden className="mx-auto size-12 text-[var(--color-signal-blue)]" strokeWidth={1.5} />
-      <h2 className="mt-5 text-[38px] font-bold leading-[1.21] text-balance">Заявка принята</h2>
-      <p className="mx-auto mt-3 max-w-[460px] text-[16px] leading-[1.5] text-[var(--color-slate-gray)]">
-        Менеджер свяжется в течение 2 часов и согласует удобное время звонка.
-      </p>
+      <h2 className="mt-5 text-[38px] font-bold leading-[1.21] text-balance">
+        {slotText ? "Звонок забронирован" : "Заявка принята"}
+      </h2>
+      {slotText ? (
+        <>
+          <p className="mt-3 text-[18px] font-semibold leading-[1.4]">
+            {slotText.split(" · ").slice(0, 2).join(" · ")}
+          </p>
+          <p className="mx-auto mt-2 max-w-[460px] text-[16px] leading-[1.5] text-[var(--color-slate-gray)]">
+            Менеджер подтвердит время в течение 2 часов.
+          </p>
+        </>
+      ) : (
+        <p className="mx-auto mt-3 max-w-[460px] text-[16px] leading-[1.5] text-[var(--color-slate-gray)]">
+          Менеджер свяжется в течение 2 часов и согласует удобное время звонка.
+        </p>
+      )}
       <div className="mt-8 rounded-[16px] bg-[var(--color-pebble)] p-5 text-left sm:p-6">
         <div className="text-[18px] font-semibold leading-[1.4]">Что подготовить к звонку</div>
         <ul className="mt-3 space-y-2.5">

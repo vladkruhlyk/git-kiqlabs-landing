@@ -1,6 +1,6 @@
 /**
- * Слоты звонка для квиза со звонком (/b2b/call): ближайшие 3 рабочих дня
- * (пн–пт), по 30 минут с 10:00 до 18:00 по времени страны клиента. Сегодня — только слоты,
+ * Слоты звонка для квиза со звонком (/b2b/call): рабочие дни (пн–пт) на три
+ * недели вперёд, по 30 минут с 10:00 до 18:00 по времени страны клиента. Сегодня — только слоты,
  * до которых осталось не меньше 2 часов. Без библиотек — через Intl.
  */
 
@@ -59,12 +59,12 @@ export function utcLabel(tz: string, at = new Date()): string {
 const dayFmt = new Intl.DateTimeFormat("ru-RU", { timeZone: "UTC", day: "numeric", month: "short" });
 const weekdayFmt = new Intl.DateTimeFormat("ru-RU", { timeZone: "UTC", weekday: "short" });
 
-export function buildSlotDays(tz: string, now = new Date(), count = 3): SlotDay[] {
+export function buildSlotDays(tz: string, now = new Date(), count = 15): SlotDay[] {
   const today = partsIn(now, tz);
   const nowMinutes = today.h * 60 + today.min;
   const days: SlotDay[] = [];
 
-  for (let i = 0; days.length < count && i < 14; i++) {
+  for (let i = 0; days.length < count && i < count * 2 + 7; i++) {
     // Календарная дата в поясе клиента, записанная как полночь UTC.
     const date = new Date(Date.UTC(today.y, today.m - 1, today.d + i));
     const wd = date.getUTCDay();

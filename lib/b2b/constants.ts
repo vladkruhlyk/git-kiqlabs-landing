@@ -60,20 +60,16 @@ export const BRANDS: Brand[] = [
   { name: "OstroVit", logo: "/media/brands/ostrovit.svg", ratio: 3.38 },
 ];
 
-/**
- * Фото банок (WebP с прозрачностью, public/media/bottles) — с официальных сайтов
- * брендов. scale — относительная высота на «полке» (банка коллагена ниже
- * флаконов), чтобы ряд выглядел как настоящая полка.
- */
+/** Фото банок (WebP с прозрачностью, public/media/bottles) — с официальных сайтов брендов. */
 export const BOTTLE_IMAGES = {
-  "now-vitamin-d3": { src: "/media/bottles/now-vitamin-d3.webp", alt: "NOW Foods Vitamin D3 5000 IU", w: 312, h: 640, scale: 1 },
-  "now-magnesium-citrate": { src: "/media/bottles/now-magnesium-citrate.webp", alt: "NOW Foods Magnesium Citrate", w: 340, h: 640, scale: 0.95 },
-  "solgar-vitamin-c": { src: "/media/bottles/solgar-vitamin-c.webp", alt: "Solgar Vitamin C 1000 mg", w: 340, h: 640, scale: 1 },
-  "solgar-vitamin-d3": { src: "/media/bottles/solgar-vitamin-d3.webp", alt: "Solgar Vitamin D3", w: 331, h: 640, scale: 0.92 },
-  "solgar-coq10": { src: "/media/bottles/solgar-coq10.webp", alt: "Solgar CoQ-10", w: 329, h: 640, scale: 0.88 },
-  "triple-zinc": { src: "/media/bottles/ostrovit-triple-zinc.webp", alt: "OstroVit Triple Zinc", w: 334, h: 640, scale: 1.05 },
-  "vitamin-d3": { src: "/media/bottles/ostrovit-vitamin-d3.webp", alt: "OstroVit Vitamin D3 2000 IU", w: 212, h: 406, scale: 0.9 },
-  "marine-collagen": { src: "/media/bottles/ostrovit-marine-collagen.webp", alt: "OstroVit Marine Collagen 200 g", w: 386, h: 405, scale: 0.8 },
+  "now-vitamin-d3": { src: "/media/bottles/now-vitamin-d3.webp", alt: "NOW Foods Vitamin D3 5000 IU", w: 312, h: 640 },
+  "now-magnesium-citrate": { src: "/media/bottles/now-magnesium-citrate.webp", alt: "NOW Foods Magnesium Citrate", w: 340, h: 640 },
+  "solgar-vitamin-c": { src: "/media/bottles/solgar-vitamin-c.webp", alt: "Solgar Vitamin C 1000 mg", w: 340, h: 640 },
+  "solgar-vitamin-d3": { src: "/media/bottles/solgar-vitamin-d3.webp", alt: "Solgar Vitamin D3", w: 331, h: 640 },
+  "solgar-coq10": { src: "/media/bottles/solgar-coq10.webp", alt: "Solgar CoQ-10", w: 329, h: 640 },
+  "triple-zinc": { src: "/media/bottles/ostrovit-triple-zinc.webp", alt: "OstroVit Triple Zinc", w: 334, h: 640 },
+  "vitamin-d3": { src: "/media/bottles/ostrovit-vitamin-d3.webp", alt: "OstroVit Vitamin D3 2000 IU", w: 212, h: 406 },
+  "marine-collagen": { src: "/media/bottles/ostrovit-marine-collagen.webp", alt: "OstroVit Marine Collagen 200 g", w: 386, h: 405 },
 } as const;
 
 export type BottleId = keyof typeof BOTTLE_IMAGES;

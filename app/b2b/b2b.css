@@ -221,6 +221,11 @@
     filter: drop-shadow(0 18px 22px rgba(71, 103, 136, 0.28));
   }
 
+  /* Банка на полке: короткая тень у основания, а не «парящая». */
+  .b2b .b2b-shelf-shadow {
+    filter: drop-shadow(0 6px 5px rgba(71, 103, 136, 0.22));
+  }
+
   /* Elevation из DESIGN.md */
   .b2b .b2b-shadow-card {
     box-shadow: var(--shadow-sm);

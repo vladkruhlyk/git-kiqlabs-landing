@@ -23,12 +23,15 @@ function BottleImg({
   id,
   index,
   eager,
+  still,
   className,
   style,
 }: {
   id: BottleId;
   index: number;
   eager?: boolean;
+  /** Без «плавания»: банка стоит (полка). */
+  still?: boolean;
   className?: string;
   style?: React.CSSProperties;
 }) {
@@ -44,8 +47,12 @@ function BottleImg({
       loading={eager ? "eager" : "lazy"}
       decoding="async"
       draggable={false}
-      className={cn("b2b-float b2b-bottle-shadow select-none", className)}
-      style={{ animationDuration: t.dur, animationDelay: t.delay, ...style }}
+      className={cn(
+        "select-none",
+        still ? "b2b-shelf-shadow" : "b2b-float b2b-bottle-shadow",
+        className,
+      )}
+      style={still ? style : { animationDuration: t.dur, animationDelay: t.delay, ...style }}
     />
   );
 }
@@ -77,25 +84,32 @@ export function BottleGroup({
 }
 
 /**
- * «Полка»: ряд банок разных форм, выровненных по высоте с учётом реального
- * размера упаковки (scale). На мобиле видны только первые mobile позиций.
+ * «Полка»: банки стоят на планке плотным рядом, все одной высоты, без
+ * «плавания» — как витрина в магазине. Планка ровно по ширине ряда.
+ * На мобиле видны только позиции из mobile.
  */
 export function ProductShelf({ ids, mobile }: { ids: BottleId[]; mobile: BottleId[] }) {
   return (
-    <div aria-hidden className="pointer-events-none relative mx-auto max-w-[1000px] [--shelf-h:118px] lg:[--shelf-h:168px]">
-      <div className="relative z-10 flex items-end justify-center gap-1 px-2 sm:gap-3 lg:gap-5">
-        {ids.map((id, i) => (
-          <BottleImg
-            key={id}
-            id={id}
-            index={i}
-            className={cn("w-auto", !mobile.includes(id) && "hidden sm:block")}
-            style={{ height: `calc(var(--shelf-h) * ${BOTTLE_IMAGES[id].scale})` }}
-          />
-        ))}
+    <div
+      aria-hidden
+      className="pointer-events-none flex justify-center [--shelf-h:108px] sm:[--shelf-h:128px] lg:[--shelf-h:150px]"
+    >
+      <div className="inline-flex flex-col">
+        <div className="relative z-10 flex items-end justify-center gap-2 px-3 sm:gap-3 lg:gap-4 lg:px-6">
+          {ids.map((id, i) => (
+            <BottleImg
+              key={id}
+              id={id}
+              index={i}
+              still
+              className={cn("w-auto", !mobile.includes(id) && "hidden sm:block")}
+              style={{ height: "var(--shelf-h)" }}
+            />
+          ))}
+        </div>
+        {/* Планка: банки «стоят» на ней — заходят на её верхний край. */}
+        <div className="-mt-1.5 h-3 rounded-full border border-[var(--color-hairline)] bg-[var(--color-paper)] b2b-shadow-card" />
       </div>
-      {/* Сама полка: белая планка с мягкой тенью системы. */}
-      <div className="relative -mt-2 h-4 rounded-full border border-[var(--color-hairline)] bg-[var(--color-paper)] b2b-shadow-card" />
     </div>
   );
 }

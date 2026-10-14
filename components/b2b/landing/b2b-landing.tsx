@@ -106,16 +106,15 @@ export function B2BLanding() {
             <Blob color="magenta" className="right-[10%] top-2 size-36 lg:size-52" />
             <ProductShelf
               ids={[
+                "now-vitamin-d3",
                 "now-magnesium-citrate",
                 "solgar-vitamin-c",
-                "triple-zinc",
-                "now-vitamin-d3",
-                "marine-collagen",
-                "solgar-coq10",
-                "vitamin-d3",
                 "solgar-vitamin-d3",
+                "solgar-coq10",
+                "triple-zinc",
+                "vitamin-d3",
               ]}
-              mobile={["solgar-vitamin-c", "now-vitamin-d3", "marine-collagen", "solgar-coq10"]}
+              mobile={["now-vitamin-d3", "solgar-vitamin-c", "solgar-vitamin-d3", "triple-zinc"]}
             />
           </div>
         </Section>

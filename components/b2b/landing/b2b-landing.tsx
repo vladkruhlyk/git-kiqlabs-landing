@@ -13,8 +13,8 @@ import {
   TopStrip,
 } from "@/components/b2b/ui/chrome";
 import { StickyBar } from "@/components/b2b/ui/sticky-bar";
-import { BottleGroup, ProductShelf } from "@/components/b2b/ui/bottles";
-import { Blob } from "@/components/b2b/ui/blob";
+import { BottleGroup, ProductCluster } from "@/components/b2b/ui/bottles";
+import { BlobbedVisual } from "@/components/b2b/ui/blob";
 import { EMAIL, FACTS } from "@/lib/b2b/constants";
 import { PriceListMockup } from "./price-list-mockup";
 import { OfficesCard } from "./offices-card";
@@ -38,6 +38,12 @@ const AUDIENCE = [
     title: "Интернет-магазины и селлеры маркетплейсов",
     body: "Документы и штрихкоды для карточек товара",
   },
+];
+
+const BRAND_POINTS = [
+  "Прямые контракты с фабриками США и ЕС",
+  `Прайс по вашему списку SKU за ${FACTS.priceIn}`,
+  "Минимальный заказ — $5 000 на бренд",
 ];
 
 const STEPS = [
@@ -98,24 +104,44 @@ export function B2BLanding() {
           </Container>
         </section>
 
-        {/* ─── Бренды и полка ─── */}
+        {/* ─── Бренды ─── */}
         <Section className="py-8 lg:py-10">
           <LogoStrip caption={`${FACTS.brands} брендов с прямыми контрактами`} />
-          <div className="relative mt-12 lg:mt-16">
-            <Blob color="cyan" className="-top-6 left-[8%] size-40 lg:size-56" />
-            <Blob color="magenta" className="right-[10%] top-2 size-36 lg:size-52" />
-            <ProductShelf
-              ids={[
-                "now-vitamin-d3",
-                "now-magnesium-citrate",
-                "solgar-vitamin-c",
-                "solgar-vitamin-d3",
-                "solgar-coq10",
-                "triple-zinc",
-                "vitamin-d3",
-              ]}
-              mobile={["now-vitamin-d3", "solgar-vitamin-c", "solgar-vitamin-d3", "triple-zinc"]}
-            />
+        </Section>
+
+        {/* ─── Бренды в одном прайсе: текст + композиция банок ─── */}
+        <Section>
+          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
+            <div>
+              <h2 className="b2b-h2 text-balance">Бренды США и ЕС в одном прайсе</h2>
+              <p className="b2b-lead mt-4 max-w-[520px]">
+                NOW Foods, Solgar, Optimum Nutrition и другие — всего {FACTS.brands} брендов
+                витаминов и спортпита по прямым контрактам с фабриками.
+              </p>
+              <ul className="mt-6 space-y-3">
+                {BRAND_POINTS.map((t) => (
+                  <li key={t} className="flex items-start gap-3 text-[18px] font-medium leading-[1.4]">
+                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-[var(--color-badge-fill)] text-[var(--color-signal-blue)]">
+                      <Check aria-hidden className="size-3.5" strokeWidth={3} />
+                    </span>
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <BlobbedVisual className="mx-auto w-full max-w-[520px]">
+              <ProductCluster
+                ids={[
+                  "solgar-coq10",
+                  "vitamin-d3",
+                  "solgar-vitamin-d3",
+                  "now-magnesium-citrate",
+                  "triple-zinc",
+                  "solgar-vitamin-c",
+                  "now-vitamin-d3",
+                ]}
+              />
+            </BlobbedVisual>
           </div>
         </Section>
 

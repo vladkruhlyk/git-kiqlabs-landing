@@ -91,7 +91,7 @@ export function B2BLanding() {
               <PriceListMockup />
               <BottleGroup
                 eager
-                ids={["omega-3", "triple-zinc", "biotin-plus"]}
+                ids={["solgar-vitamin-c", "now-vitamin-d3", "triple-zinc"]}
                 className="absolute bottom-0 right-1 w-[64%] sm:-bottom-2 sm:right-0 sm:w-[54%] lg:-right-10 lg:w-[60%]"
               />
             </div>
@@ -106,14 +106,16 @@ export function B2BLanding() {
             <Blob color="magenta" className="right-[10%] top-2 size-36 lg:size-52" />
             <ProductShelf
               ids={[
-                "vitamin-d3",
-                "omega-3",
+                "now-magnesium-citrate",
+                "solgar-vitamin-c",
                 "triple-zinc",
+                "now-vitamin-d3",
                 "marine-collagen",
-                "magnesium-glycinate",
-                "biotin-plus",
+                "solgar-coq10",
+                "vitamin-d3",
+                "solgar-vitamin-d3",
               ]}
-              mobile={["vitamin-d3", "triple-zinc", "marine-collagen", "magnesium-glycinate"]}
+              mobile={["solgar-vitamin-c", "now-vitamin-d3", "marine-collagen", "solgar-coq10"]}
             />
           </div>
         </Section>
@@ -209,9 +211,9 @@ export function B2BLanding() {
             </div>
             <div className="relative">
               <OfficesCard />
-              {/* Флакон и банка — в правой (пустой) части строк, над подвалом карточки. */}
+              {/* Флакон NOW и банка — в правой (пустой) части строк, над подвалом карточки. */}
               <BottleGroup
-                ids={["triple-zinc", "marine-collagen"]}
+                ids={["now-magnesium-citrate", "marine-collagen"]}
                 className="absolute bottom-[64px] right-1 w-[44%] sm:w-[40%] lg:-right-10 lg:w-[44%]"
               />
             </div>

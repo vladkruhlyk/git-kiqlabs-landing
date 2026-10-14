@@ -86,7 +86,7 @@ export function PriceListMockup() {
         </ul>
 
         {/* На мобиле нижний отступ — «полка» под банки, чтобы они не закрывали текст. */}
-        <div className="flex items-start justify-between gap-3 border-t border-[var(--color-hairline)] px-4 pb-[72px] pt-4 sm:items-center sm:px-5 sm:py-4">
+        <div className="flex items-start justify-between gap-3 border-t border-[var(--color-hairline)] px-4 pb-20 pt-4 sm:items-center sm:px-5 sm:py-4">
           <span className="text-[14px] font-semibold leading-[1.4]">Минимальный заказ: $5 000</span>
           <span className="text-[12px] leading-[1.5] text-[var(--color-slate-gray)]">MOQ — шт.</span>
         </div>

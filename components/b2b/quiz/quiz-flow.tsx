@@ -422,7 +422,7 @@ function StartScreen({
           <ResultPreview countryName={countryName} />
           <BottleGroup
             eager
-            ids={["omega-3", "triple-zinc", "biotin-plus"]}
+            ids={["now-magnesium-citrate", "solgar-vitamin-d3", "vitamin-d3"]}
             className="absolute -bottom-2 right-0 w-[54%] sm:w-[46%] lg:-right-8 lg:w-[54%]"
           />
         </div>

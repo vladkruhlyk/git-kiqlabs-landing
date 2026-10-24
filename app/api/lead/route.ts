@@ -1,5 +1,6 @@
 import { NextResponse, after } from "next/server";
 import { notify } from "@/lib/notify";
+import { buildLeadTelegramText } from "@/lib/lead-telegram";
 import { sendCapiEvent } from "@/lib/meta-capi";
 import { isQualifiedLead } from "@/lib/b2b/qualify";
 
@@ -186,6 +187,30 @@ function notifyNewLead(data: LeadBody, qualified: boolean): Promise<void> {
     {
       // Дедуп: повторный POST с теми же контактами не задублирует уведомление.
       eventId: `lead:${source}:${str(data.email)}:${str(data.phone)}:${str(data.name)}`,
+      // В Telegram — оформленная карточка; в Sheets уходят поля выше как есть.
+      telegramText: (tz) =>
+        buildLeadTelegramText(
+          {
+            source,
+            sourceLabel: sourceLabel(data.source),
+            qualified,
+            name: str(data.name),
+            company: str(data.company),
+            email: str(data.email),
+            phone: str(data.phone),
+            country: str(data.country),
+            role: str(data.role),
+            categories: str(data.categories),
+            volume: str(data.volume),
+            inquiry: str(data.inquiry),
+            message: str(data.message),
+            bin: str(data.bin),
+            tags: str(data.tags),
+            slot: str(data.slot),
+            utm,
+          },
+          tz,
+        ),
     },
   );
 }

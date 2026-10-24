@@ -27,6 +27,11 @@ export type NotifyOptions = {
   timezone?: string;
   /** Явный порядок колонок для массива row (Apps Script → appendRow(data.row)). */
   columns?: string[];
+  /**
+   * Готовый текст для Telegram (HTML). Если не задан — простой список полей.
+   * Sheets и вебхук всегда получают плоские fields.
+   */
+  telegramText?: (tz: string) => string;
 };
 
 const TIMEOUT_MS = 5000;
@@ -45,7 +50,7 @@ function isDuplicate(eventId?: string): boolean {
 }
 
 /* ─────────── Форматирование ─────────── */
-function escapeHtml(s: string): string {
+export function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
@@ -130,18 +135,27 @@ async function sendTelegram(
   eventTitle: string,
   fields: NotifyFields,
   tz: string,
+  custom?: (tz: string) => string,
 ): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
   if (!token || !chatId) return; // no-op, если не настроено
 
-  const text = buildTelegramText(eventTitle, fields, tz);
-  const res = await postJson(`https://api.telegram.org/bot${token}/sendMessage`, {
-    chat_id: chatId,
-    text,
-    parse_mode: "HTML",
-    disable_web_page_preview: true,
-  });
+  const send = (text: string) =>
+    postJson(`https://api.telegram.org/bot${token}/sendMessage`, {
+      chat_id: chatId,
+      text,
+      parse_mode: "HTML",
+      disable_web_page_preview: true,
+    });
+  let res = await send(custom ? custom(tz) : buildTelegramText(eventTitle, fields, tz));
+  // Оформленный текст не прошёл (например, разметку не принял парсер) —
+  // шлём простой список полей, чтобы заявка не потерялась.
+  if (!res.ok && custom) {
+    const b = await res.text().catch(() => "");
+    console.error("[notify] telegram (оформленный)", res.status, b.slice(0, 300));
+    res = await send(buildTelegramText(eventTitle, fields, tz));
+  }
   if (!res.ok) {
     const b = await res.text().catch(() => "");
     console.error("[notify] telegram", res.status, b.slice(0, 300));
@@ -194,7 +208,7 @@ export async function notify(
       opts.timezone ?? process.env.NOTIFY_TIMEZONE ?? "Europe/Kyiv";
 
     const results = await Promise.allSettled([
-      sendTelegram(eventTitle, fields, tz),
+      sendTelegram(eventTitle, fields, tz, opts.telegramText),
       sendSheets(eventTitle, fields, tz, opts.columns),
       sendGeneric(eventTitle, fields, tz, opts.columns),
     ]);
